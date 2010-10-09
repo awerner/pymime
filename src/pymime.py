@@ -66,19 +66,38 @@ class EMail( object ):
             self.parse_singlepart()
     def parse_multipart( self ):
         mails = []
+        has_plaintext = False
+        has_html = False
         for part in self.message.walk():
             content_type = part.get_content_type()
-            if content_type in ["multipart/alternative", "multipart/related"]:
-                continue
-            mail = EMail()
-            mail.feed( message = part )
-            mail.parse()
-            if mail.to_include:
-                mails.append( mail.message )
+            if content_type == "text/plain":
+                has_plaintext = True
+            if content_type == "text/html":
+                has_html = True
+        if has_plaintext and has_html:
+            for part in self.message.walk():
+                content_type = part.get_content_type()
+                if content_type == "text/plain":
+                    mails.append( part )
+        else:
+            for part in self.message.walk():
+                content_type = part.get_content_type()
+                if content_type in ["multipart/alternative", "multipart/related"]:
+                    continue
+                mail = EMail()
+                mail.feed( message = part )
+                mail.parse()
+                if mail.to_include:
+                    mails.append( mail.message )
         if mails:
             self.message.set_payload( None )
-            for mail in mails:
-                self.message.attach( mail )
+            if len( mails ) == 1:
+                del self.message["Content-Type"]
+                self.message["Content-Type"] = mails[0].get_content_type()
+                self.message.set_payload( mails[0].get_payload() )
+            else:
+                for mail in mails:
+                    self.message.attach( mail )
         else:
             raise Exception
     def parse_singlepart( self ):
@@ -90,6 +109,8 @@ class EMail( object ):
             s.feed( self.message.get_payload() )
             self.message.set_payload( s.get_plain_data() )
             self.to_include = True
+            for key in self.message.keys():
+                del self.message[key]
     def get_string( self ):
         return self.message.as_string()
 
