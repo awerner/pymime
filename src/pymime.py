@@ -5,11 +5,21 @@ This script takes a MIME-formatted email and does various transformations with i
 e.g. converts HTML-mails to plain text mails and strips attachements.
 """
 import HTMLParser, email, sys
+from optparse import OptionParser
 
 IGNORETAGS = ( "script", "head", "title", "link" )
 MAP_STARTTAGS = {"li": "\n* "}
 MAP_ENDTAGS = { "p": "\n", "div": "\n"}
 MAXNUMNEWLINES = 2
+
+
+parser = OptionParser()
+parser.add_option( "-i", "--input", dest = "input", default = "-",
+                   help = "Where to read the mail from. Defaults to STDIN" )
+parser.add_option( "-o", "--output", dest = "output", default = "-",
+                   help = "Where to write the transformed mail. Defaults to STDOUT" )
+options, args = parser.parse_args()
+
 
 class StripHTML( HTMLParser.HTMLParser ):
     def __init__( self ):
@@ -116,8 +126,16 @@ class EMail( object ):
 
 
 if __name__ == "__main__":
+    if options.input == "-":
+        input = sys.stdin
+    else:
+        input = file( options.input )
+    if options.output == "-":
+        output = sys.stdout
+    else:
+        output = file( options.output, "w" )
     e = EMail()
-    #e.feed( fp = sys.stdin  )
-    e.feed( fp = file( "test.eml" ) )
+    e.feed( fp = input )
     e.parse()
-    print e.get_string()
+    output.write( e.get_string() )
+    output.close()
