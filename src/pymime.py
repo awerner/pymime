@@ -4,7 +4,7 @@
 This script takes a MIME-formatted email and does various transformations with it,
 e.g. converts HTML-mails to plain text mails and strips attachements.
 """
-import HTMLParser
+import HTMLParser, email, sys
 
 IGNORETAGS = ( "script", "head", "title", "link" )
 MAP_STARTTAGS = {"li": "\n* "}
@@ -47,9 +47,56 @@ class StripHTML( HTMLParser.HTMLParser ):
         self.remove_whitespace()
         return "\n".join( self.plain )
 
+class EMail( object ):
+    def __init__( self ):
+        self.to_include = False
+    def feed( self, fp = None, string = None, message = None ):
+        if fp is not None:
+            self.message = email.message_from_file( fp )
+        elif string is not None:
+            self.message = email.message_from_string( string )
+        elif message is not None:
+            self.message = message
+        else:
+            raise AttributeError
+    def parse( self ):
+        if self.message.is_multipart():
+            self.parse_multipart()
+        else:
+            self.parse_singlepart()
+    def parse_multipart( self ):
+        mails = []
+        for part in self.message.walk():
+            content_type = part.get_content_type()
+            if content_type in ["multipart/alternative", "multipart/related"]:
+                continue
+            mail = EMail()
+            mail.feed( message = part )
+            mail.parse()
+            if mail.to_include:
+                mails.append( mail.message )
+        if mails:
+            self.message.set_payload( None )
+            for mail in mails:
+                self.message.attach( mail )
+        else:
+            raise Exception
+    def parse_singlepart( self ):
+        content_type = self.message.get_content_type()
+        if content_type == "text/plain":
+            self.to_include = True
+        elif content_type == "text/html":
+            s = StripHTML()
+            s.feed( self.message.get_payload() )
+            self.message.set_payload( s.get_plain_data() )
+            self.to_include = True
+    def get_string( self ):
+        return self.message.as_string()
+
+
 if __name__ == "__main__":
-    s = StripHTML()
-    with file( "test.html" ) as f:
-        s.feed( f.read() )
-    with file( "test", "w" ) as f:
-        f.write( s.get_plain_data() )
+    e = EMail()
+    #e.feed( fp = sys.stdin  )
+    e.feed( fp = file( "test.eml" ) )
+    e.parse()
+    print e.get_string()
