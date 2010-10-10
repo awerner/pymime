@@ -91,8 +91,7 @@ class EMail( object ):
                     mails.append( part )
         else:
             for part in self.message.walk():
-                content_type = part.get_content_type()
-                if content_type in ["multipart/alternative", "multipart/related"]:
+                if part.is_multipart():
                     continue
                 mail = EMail()
                 mail.feed( message = part )
