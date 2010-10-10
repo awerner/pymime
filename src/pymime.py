@@ -47,7 +47,7 @@ class StripHTML( HTMLParser.HTMLParser ):
             self.plain.append( data.strip() )
     def remove_whitespace( self ):
         # Split at newlines instead of tags
-        self.plain = " ".join( self.plain ).split( "\n" )
+        self.plain = "".join( self.plain ).split( "\n" )
         numspace = 0
         # Copy the whole text
         oldplain = self.plain[:]
