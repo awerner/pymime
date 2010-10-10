@@ -103,7 +103,7 @@ class EMail( object ):
             self.message.set_payload( None )
             if len( mails ) == 1:
                 del self.message["Content-Type"]
-                self.message["Content-Type"] = mails[0].get_content_type()
+                self.message["Content-Type"] = mails[0]["Content-Type"]
                 self.message.set_payload( mails[0].get_payload() )
             else:
                 for mail in mails:
