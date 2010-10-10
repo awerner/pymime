@@ -11,8 +11,16 @@ from optparse import OptionParser
 # Configuration Options start here
 
 IGNORETAGS = ( "script", "head", "title", "link" )
-MAP_STARTTAGS = {"li": "\n* "}
-MAP_ENDTAGS = { "p": "\n", "div": "\n"}
+MAP_STARTTAGS = {"li": "\n* ",
+                 "b": "\n"}
+MAP_ENDTAGS = { "p": "\n",
+               "div": "\n",
+               "h1": "\n==============================================================\n\n",
+               "h2": "\n--------------------------------------------------------------\n\n",
+               "h3": "\n",
+               "h4": "\n",
+               "h5": "\n",
+               "h6": "\n"}
 MAXNUMNEWLINES = 2
 
 # No Configuration beneath this line
