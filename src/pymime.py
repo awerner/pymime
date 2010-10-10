@@ -176,7 +176,7 @@ class EMail( object ):
             # if I'm a submessage I also want to be included
             self.to_include = True
             # rewrite the Content-Type header, im no longer an evil HTML mail :)
-            self.message.set_item( "Content-Type", self.message["Content-Type"].replace( "text/html", "text/plain", 1 ) )
+            self.message.set_param( "Content-Type", self.message["Content-Type"].replace( "text/html", "text/plain", 1 ) )
     def get_string( self ):
         """
         Returns the string representation of the supplied message.
