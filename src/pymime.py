@@ -102,8 +102,13 @@ class EMail( object ):
         if mails:
             self.message.set_payload( None )
             if len( mails ) == 1:
-                del self.message["Content-Type"]
-                self.message["Content-Type"] = mails[0]["Content-Type"]
+                mail = mails[0]
+                for key in mail.keys():
+                    del self.message[key]
+                    self.message[ key] = mail[key]
+                if "multipart" in self.message.get_content_maintype():
+                    del self.message["Content-Type"]
+                    self.message["Content-Type"] = "text/plain"
                 self.message.set_payload( mails[0].get_payload() )
             else:
                 for mail in mails:
@@ -119,8 +124,7 @@ class EMail( object ):
             s.feed( self.message.get_payload() )
             self.message.set_payload( s.get_plain_data() )
             self.to_include = True
-            for key in self.message.keys():
-                del self.message[key]
+            self.message.set_item( "Content-Type", self.message["Content-Type"].replace( "text/html", "text/plain", 1 ) )
     def get_string( self ):
         return self.message.as_string()
 
