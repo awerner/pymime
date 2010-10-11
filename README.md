@@ -15,3 +15,8 @@ Usage
 	            Where to read the mail from. Defaults to STDIN
 	  -o OUTPUT, --output=OUTPUT
 	            Where to write the transformed mail. Defaults to STDOUT
+
+License
+-------
+
+GPLv3
