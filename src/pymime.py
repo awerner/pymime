@@ -196,7 +196,7 @@ class EMail( object ):
         with open( filename ) as f:
             cs = self.message.get_charset()
             if cs == None:
-                cs = "iso-8859-1"
+                cs = "iso-8859-15"
             self.message.set_payload( self.message.get_payload( decode = True ) + "\n" + f.read().decode( "utf-8" ).encode( cs ), cs )
 
 
