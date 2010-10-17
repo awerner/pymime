@@ -32,6 +32,8 @@ parser.add_option( "-i", "--input", dest = "input", default = "-",
                    help = "Where to read the mail from. Defaults to STDIN" )
 parser.add_option( "-o", "--output", dest = "output", default = "-",
                    help = "Where to write the transformed mail. Defaults to STDOUT" )
+parser.add_option( "-f", "--footer", dest = "footer", default = None,
+                   help = "UTF-8 encoded footer to append to every mail." )
 options, args = parser.parse_args()
 
 
@@ -190,6 +192,12 @@ class EMail( object ):
         Returns the string representation of the supplied message.
         """
         return self.message.as_string()
+    def append_footer_from_file( self, filename ):
+        with open( filename ) as f:
+            cs = self.message.get_charset()
+            if cs == None:
+                cs = "iso-8859-1"
+            self.message.set_payload( self.message.get_payload( decode = True ) + "\n" + f.read().decode( "utf-8" ).encode( cs ), cs )
 
 
 if __name__ == "__main__":
@@ -204,5 +212,7 @@ if __name__ == "__main__":
     e = EMail()
     e.feed( fp = input )
     e.parse()
+    if options.footer:
+        e.append_footer_from_file( options.footer )
     output.write( e.get_string() )
     output.close()
