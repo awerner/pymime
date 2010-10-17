@@ -194,7 +194,7 @@ class EMail( object ):
         return self.message.as_string()
     def append_footer_from_file( self, filename ):
         with open( filename ) as f:
-            cs = self.message.get_charset()
+            cs = self.message.get_content_charset()
             if cs == None:
                 cs = "iso-8859-15"
             self.message.set_payload( self.message.get_payload( decode = True ) + "\n" + f.read().decode( "utf-8" ).encode( cs ), cs )
