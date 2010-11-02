@@ -15,6 +15,12 @@ Usage
 	            Where to read the mail from. Defaults to STDIN
 	  -o OUTPUT, --output=OUTPUT
 	            Where to write the transformed mail. Defaults to STDOUT
+	  -f FOOTER, --footer=FOOTER
+	            UTF-8 encoded footer to append to every mail.
+	  -k, --keep-going      
+	            Ignore failures (ATM only missing footer file) as much
+	            as possible before failing.
+	
 
 License
 -------

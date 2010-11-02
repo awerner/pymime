@@ -34,6 +34,8 @@ parser.add_option( "-o", "--output", dest = "output", default = "-",
                    help = "Where to write the transformed mail. Defaults to STDOUT" )
 parser.add_option( "-f", "--footer", dest = "footer", default = None,
                    help = "UTF-8 encoded footer to append to every mail." )
+parser.add_option( "-k", "--keep-going", dest = "keep_going", action = "store_true", default = False,
+                   help = "Ignore failures (ATM only missing footer file) as much as possible before failing." )
 options, args = parser.parse_args()
 
 
@@ -80,8 +82,9 @@ class EMail( object ):
     """
     This class represents an email or a single payload of a multipart email.
     """
-    def __init__( self ):
+    def __init__( self, keep_going = False ):
         self.to_include = False
+        self.keep_going = keep_going
     def feed( self, fp = None, string = None, message = None ):
         """
         Feeds the EMail object with data. If fp is supplied, a new message will be created using
@@ -193,11 +196,15 @@ class EMail( object ):
         """
         return self.message.as_string()
     def append_footer_from_file( self, filename ):
-        with open( filename ) as f:
-            cs = self.message.get_content_charset()
-            if cs == None:
-                cs = "iso-8859-15"
-            self.message.set_payload( self.message.get_payload( decode = True ) + "\n" + f.read().decode( "utf-8" ).encode( cs ), cs )
+        try:
+            with open( filename ) as f:
+                cs = self.message.get_content_charset()
+                if cs == None:
+                    cs = "iso-8859-15"
+                self.message.set_payload( self.message.get_payload( decode = True ) + "\n" + f.read().decode( "utf-8" ).encode( cs ), cs )
+        except:
+            if not self.keep_going:
+                raise
 
 
 if __name__ == "__main__":
@@ -209,7 +216,7 @@ if __name__ == "__main__":
         output = sys.stdout
     else:
         output = file( options.output, "w" )
-    e = EMail()
+    e = EMail( keep_going = options.keep_going )
     e.feed( fp = input )
     e.parse()
     if options.footer:
