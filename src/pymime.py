@@ -27,7 +27,7 @@ from optparse import OptionParser
 
 IGNORETAGS = ( "script", "head", "title", "link" )
 MAP_STARTTAGS = {"li": "\n* ",
-                 "b": "\n"}
+                 "p": "\n"}
 MAP_ENDTAGS = { "p": "\n",
                "div": "\n",
                "h1": "\n==============================================================\n\n",
