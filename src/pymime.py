@@ -192,7 +192,7 @@ class EMail( object ):
             raise Exception
     def addArchiveHeader( self ):
         """
-        Add mail-archive.com direct-link to archive http://www.mail-archive.com                                                                             /faq.html#listserver
+        Add mail-archive.com direct-link to archive http://www.mail-archive.com/faq.html#listserver
         """
         message_id = self.message['message-id']
         list_post = self.message['to']
