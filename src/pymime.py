@@ -21,7 +21,9 @@ e.g. converts HTML-mails to plain text mails and strips attachements.
 """
 import HTMLParser, email, sys
 from optparse import OptionParser
-
+# for archive-header
+import hashlib
+import base64
 #-------------------------------------------------------------------------------
 # Configuration Options start here
 
@@ -51,6 +53,8 @@ parser.add_option( "-f", "--footer", dest = "footer", default = None,
                    help = "UTF-8 encoded footer to append to every mail." )
 parser.add_option( "-k", "--keep-going", dest = "keep_going", action = "store_true", default = False,
                    help = "Ignore failures (ATM only missing footer file) as much as possible before failing." )
+parser.add_option( "-a", "--archive-header", dest = "archive_header", action = "store_true", default = False,
+                   help = "Add Archived-At header for mail-archive.com" )
 options, args = parser.parse_args()
 
 
@@ -186,6 +190,23 @@ class EMail( object ):
         # No Message is to be included
         else:
             raise Exception
+    def addArchiveHeader( self ):
+        """
+        Add mail-archive.com direct-link to archive http://www.mail-archive.com                                                                             /faq.html#listserver
+        """
+        message_id = self.message['message-id']
+        list_post = self.message['to']
+        if ( message_id is not None ) and ( list_post is not None ):
+            # remove < and > from msg-id
+            sha = hashlib.sha1( message_id[1:-1] )
+            sha.update( list_post )
+            hash = base64.urlsafe_b64encode( sha.digest() )
+            url = "<http://go.mail-archive.com/%s>" % hash
+            self.message['Archived-At'] = url
+            # in case debugging is needed
+            #self.message['X-Archived-At-msgid'] = message_id[1:-1]
+            #self.message['X-Archived-At-list-post'] = list_post
+
     def parse_singlepart( self ):
         """
         Parses a singlepart message object.
@@ -234,6 +255,8 @@ if __name__ == "__main__":
     e = EMail( keep_going = options.keep_going )
     e.feed( fp = input )
     e.parse()
+    if options.archive_header:
+        e.addArchiveHeader()
     if options.footer:
         e.append_footer_from_file( options.footer )
     output.write( e.get_string() )
