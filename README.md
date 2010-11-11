@@ -20,6 +20,8 @@ Usage
 	  -k, --keep-going      
 	            Ignore failures (ATM only missing footer file) as much
 	            as possible before failing.
+	  -a, --archive-header      
+	            Add Archived-At header for mail-archive.com
 	
 
 License
