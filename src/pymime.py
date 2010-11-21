@@ -231,16 +231,30 @@ class EMail( object ):
         Returns the string representation of the supplied message.
         """
         return self.message.as_string()
+
     def append_footer_from_file( self, filename ):
+        rawfooter = None
+        footer = None
+        orig_cs = self.message.get_content_charset()
+        if orig_cs == None:
+            cs = "iso-8859-15"
+            orig_cs = "ascii"
+        else:
+            cs = orig_cs
         try:
             with open( filename ) as f:
-                cs = self.message.get_content_charset()
-                if cs == None:
-                    cs = "iso-8859-15"
-                self.message.set_payload( self.message.get_payload( decode = True ) + "\n" + f.read().decode( "utf-8" ).encode( cs ), cs )
+                rawfooter = f.read()
         except:
             if not self.keep_going:
                 raise
+        if rawfooter:
+            try:
+                footer = rawfooter.decode( "utf-8" ).encode( cs )
+            except:
+                cs = "utf-8"
+                footer = rawfooter.decode( "utf-8" ).encode( cs )
+        if footer:
+            self.message.set_payload( self.message.get_payload( decode = True ).decode( orig_cs ).encode( cs ) + "\n" + footer, cs )
 
 
 if __name__ == "__main__":
