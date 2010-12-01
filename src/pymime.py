@@ -254,6 +254,9 @@ class EMail( object ):
                 cs = "utf-8"
                 footer = rawfooter.decode( "utf-8" ).encode( cs )
         if footer:
+            del self.message["MIME-Version"]
+            del self.message["Content-Type"]
+            del self.message["Content-Transfer-Encoding"]
             self.message.set_payload( self.message.get_payload( decode = True ).decode( orig_cs ).encode( cs ) + "\n" + footer, cs )
 
 
