@@ -259,7 +259,6 @@ class EMail( object ):
                 sep = ""
             payload = self.message.get_payload( decode = True ).decode( orig_cs ).encode( cs ) + sep + footer
             del self.message["MIME-Version"]
-            del self.message["Content-Type"]
             del self.message["Content-Transfer-Encoding"]
             self.message.set_payload( payload, cs )
 
