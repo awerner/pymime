@@ -19,7 +19,7 @@
 This script takes a MIME-formatted email and does various transformations with it,
 e.g. converts HTML-mails to plain text mails and strips attachements.
 """
-import HTMLParser, email, sys
+import HTMLParser, email, email.utils, sys
 from optparse import OptionParser
 # for archive-header
 import hashlib
@@ -195,17 +195,17 @@ class EMail( object ):
         Add mail-archive.com direct-link to archive http://www.mail-archive.com/faq.html#listserver
         """
         message_id = self.message['message-id']
-        list_post = self.message['to']
-        if ( message_id is not None ) and ( list_post is not None ):
+        list_post = email.utils.parseaddr(self.message['to'])
+        if ( message_id is not None ) and ( list_post[1] is not '' ):
             # remove < and > from msg-id
             sha = hashlib.sha1( message_id[1:-1] )
-            sha.update( list_post )
+            sha.update( list_post[1] )
             hash = base64.urlsafe_b64encode( sha.digest() )
             url = "<http://go.mail-archive.com/%s>" % hash
             self.message['Archived-At'] = url
             # in case debugging is needed
             #self.message['X-Archived-At-msgid'] = message_id[1:-1]
-            #self.message['X-Archived-At-list-post'] = list_post
+            #self.message['X-Archived-At-list-post'] = list_post[1]
 
     def parse_singlepart( self ):
         """
