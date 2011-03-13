@@ -1,0 +1,9 @@
+[daemon]
+port=47999
+host=localhost
+authkey=###SECRETPASS###
+logfile=/var/log/pymime.log
+[client]
+port=47999
+host=localhost
+authkey=###SECRETPASS###
