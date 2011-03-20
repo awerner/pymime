@@ -1,11 +1,22 @@
 [daemon]
+# Port to listen for connections. Defaults to 47999
 port=47999
+# IP/Hostname to listen for connections. Defaults to localhost
 host=localhost
+# Password to authenticate the connection. Defaults to ###SECRETPASS###
+# It's only necessary to change the password when connections from other
+# machines are allowed, e.g. by changing the host-option above.
+# The password is only used for authentication, not encryption.
 authkey=###SECRETPASS###
+# Logfile path. Must be writeable by the server. Defaults to /var/log/pymime.log
 logfile=/var/log/pymime.log
+# Maximum number of connections before the worker processes are respawned.
 max_process_age=1000
 
 [client]
+# Port to connect to. Defaults to 47999
 port=47999
+# Host to connect to. Defaults to localhost
 host=localhost
+# Password to authenticate the connection.
 authkey=###SECRETPASS###

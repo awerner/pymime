@@ -1,4 +1,17 @@
 [footer]
+# This section is used to define a set of possible footers.
+# <footer-name>=<footer-filename>
+# e.g. de=/etc/pymime/footer.de
+# Relative paths are possible. The file is first searched for in
+# the configuration directory (normally /etc/pymime) and then in the 
+# plugin-directory.
+# The footer named default is added if no other mapping applies.
+# To deactivate the default footer, set it to None
 default=footer.en
 en=footer.en
 [map]
+# This section is used to map To: headers to footer-names.
+# <destination-address>=<footer-name>
+# e.g. frob@foo.bar=de
+# If you have a default footer and want to deactivate it for a destination,
+# set the footer-name to None
