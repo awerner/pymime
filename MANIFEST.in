@@ -1,0 +1,2 @@
+recursive-include src/pymime *.py *.conf.default
+include src/pymimec src/pymimed
