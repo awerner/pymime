@@ -11,5 +11,7 @@ setup(name='PyMIME',
       url='https://github.com/awerner/pymime',
       packages=['pymime','pymime.plugins'],
       package_dir={'':'src/'},
+      package_data={'pymime': ["*.conf.default"],
+                    'pymime.plugins': ["*.conf.default"]},
       scripts=['src/pymimec', 'src/pymimed'],
      )
