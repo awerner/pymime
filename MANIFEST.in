@@ -1,2 +1,3 @@
 recursive-include src/pymime *.py *.conf.default
+include src/pymime/plugins/footer.en
 include src/pymimec src/pymimed
