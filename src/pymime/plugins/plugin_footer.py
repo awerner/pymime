@@ -39,11 +39,17 @@ class Footer(PluginProvider):
 
     def build_footer_map(self):
         for option in self.config.map:
-            self.footer_map[option]=self.parse_path(self.config.map[option])
+            self.footer_map[option]=self.parse_path(self.config.footer[self.config.map[option]])
 
     def parse( self, message ):
         # Load footerfile before walking through the parts
         # And pass the rawfooter to the parts
+        filename = self.defaultfile
+        if "To" in message:
+            if message["To"] in self.footer_map:
+                filename = self.footer_map[message["To"]]
+        if not filename:
+            return message
         try:
             with open( filename ) as f:
                 rawfooter = f.read()
@@ -52,12 +58,12 @@ class Footer(PluginProvider):
         if message.is_multipart():
             for part in message.walk():
                 if part.get_content_type().startswith("text/"):
-                    self.parse_part(part)
+                    self.parse_part(part, rawfooter)
         else:
-            self.parse_part(message)
+            self.parse_part(message, rawfooter)
         return message
 
-    def parse_part(self,message, rawfooter=None)
+    def parse_part(self,message, rawfooter=None):
         footer = None
         orig_cs = message.get_content_charset()
         if orig_cs == None:
