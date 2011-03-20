@@ -33,9 +33,12 @@ class Footer(PluginProvider):
         if filename == "None":
             return None
         if not os.path.isabs(filename):
-            return os.path.join(os.path.abspath(pymime.plugins.__path__[0]),filename)
-        else:
-            return filename
+            filename = os.path.join(os.path.abspath(pymime.globals.CONFIGDIR),filename)
+            if not os.path.isfile(filename):
+                filename = os.path.join(os.path.abspath(pymime.plugins.__path__[0]),filename)
+        if not os.path.isfile(filename):
+            raise IOError("File {0} does not exist.".format(filename))
+        return filename
 
     def build_footer_map(self):
         for option in self.config.map:
