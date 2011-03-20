@@ -31,10 +31,14 @@ class PluginRoot(type):
         else:
             cls.plugins.append(cls)
 
+    def __order_plugins(cls):
+        cls.plugins = sorted(cls.plugins, key=lambda plugin: plugin.order)
+
     def get_plugins(cls, *args, **kwargs):
         """
         Return a list of instances of all registered plugins. Options can be passed to the constructors as parameters of this method.
         """
+        cls.__order_plugins()
         return [p(*args,**kwargs) for p in cls.plugins]
 
 
@@ -45,6 +49,8 @@ class PluginProvider(object):
     __metaclass__=PluginRoot
     name="Metaplugin"
     """Name of the plugin. Must be overwritten."""
+    order=10
+    """Determines the order of parsing. The higher the later."""
     hasconfig=False
     """
     True if the plugin has its own configuration file.

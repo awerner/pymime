@@ -20,6 +20,7 @@ import os.path
 
 class Footer(PluginProvider):
     name="Footer"
+    order=3
     hasconfig=True
 
     def __init__(self):

@@ -78,6 +78,7 @@ class StripHTMLParser(HTMLParser.HTMLParser):
 
 class StripHTML(PluginProvider):
     name="StripHTML"
+    order=2
     hasconfig=False
 
     def __init__(self):

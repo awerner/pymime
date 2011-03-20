@@ -19,6 +19,7 @@ import base64, hashlib, email.utils
 
 class ArchiveHeader(PluginProvider):
     name="ArchiveHeader"
+    order=1
     hasconfig=False
 
     def parse( self, message ):
