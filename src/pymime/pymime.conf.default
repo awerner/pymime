@@ -3,6 +3,8 @@ port=47999
 host=localhost
 authkey=###SECRETPASS###
 logfile=/var/log/pymime.log
+max_process_age=1000
+
 [client]
 port=47999
 host=localhost

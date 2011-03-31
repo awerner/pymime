@@ -57,7 +57,7 @@ class PluginProvider(object):
     def __init__(self):
         self.logger=logging.getLogger(self.name)
         if self.hasconfig:
-            self.config = ConfigWrapper(self.name)
+            self.config = ConfigWrapper(self.name.lower())
     def parse(self, message):
         self.logger.warning("method parse not implemented")
         return message

@@ -15,14 +15,32 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pymime.plugin import PluginProvider
+import pymime.plugins
+import os.path
 
 class Footer(PluginProvider):
     name="Footer"
-    hasconfig=False
+    hasconfig=True
 
-    def parse( self, message ):
-        filename = None #TODO!
-        rawfooter = None
+    def __init__(self):
+        super(Footer,self).__init__()
+        self.defaultfile=self.config.footer.default
+        if self.defaultfile == "None":
+            self.defaultfile=None
+        elif not os.path.isabs(self.defaultfile):
+            self.defaultfile=self.prepend_plugin_path(self.defaultfile)
+
+    def prepend_plugin_path(self,filename):
+        return os.path.join(os.path.abspath(pymime.plugins.__path__[0]),filename)
+
+    def parse( self, message, walk=True, rawfooter=None ):
+        # Load footerfile before walking through the parts
+        # And pass the rawfooter to the parts
+        if walk and message.is_multipart():
+            for part in message.walk():
+                if part.get_content_type().startswith("text/"):
+                    self.parse(part)
+        filename = self.defaultfile
         footer = None
         orig_cs = message.get_content_charset()
         if orig_cs == None:
@@ -30,11 +48,12 @@ class Footer(PluginProvider):
             orig_cs = "ascii"
         else:
             cs = orig_cs
-        try:
-            with open( filename ) as f:
-                rawfooter = f.read()
-        except:
-            pass
+        if not rawfooter:
+            try:
+                with open( filename ) as f:
+                    rawfooter = f.read()
+            except:
+                self.logger.warning("Could not open Footer {0}".format(filename))
         if rawfooter:
             try:
                 footer = rawfooter.decode( "utf-8" ).encode( cs )
@@ -46,7 +65,13 @@ class Footer(PluginProvider):
             if footer.startswith( "\n" ):
                 sep = ""
             payload = message.get_payload( decode = True ).decode( orig_cs ).encode( cs ) + sep + footer
-            del message["MIME-Version"]
-            del message["Content-Transfer-Encoding"]
+            try:
+                del message["MIME-Version"]
+            except:
+                pass
+            try:
+                del message["Content-Transfer-Encoding"]
+            except:
+                pass
             message.set_payload( payload, cs )
         return message

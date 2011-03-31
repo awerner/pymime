@@ -22,7 +22,9 @@ from pymime.config import mainconfig
 import pymime.plugin
 from multiprocessing.connection import Listener
 from multiprocessing import Event, Process, cpu_count
+from time import sleep
 import signal
+import sys
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -39,26 +41,53 @@ class ProcessManager(object):
     """
     address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
     listener = Listener(address, authkey=mainconfig.daemon.authkey)
-    numprocess = cpu_count()
+    maxage = int(mainconfig.daemon.max_process_age)
+    try:
+        numprocess = cpu_count()
+    except NotImplementedError:
+        numprocess = 1
 
     def __init__(self):
         ROOT_LOGGER.info("Listening on {0}:{1}".format(mainconfig.daemon.host,mainconfig.daemon.port))
-        ROOT_LOGGER.info("Setting up {0} Worker processes".format(self.numprocess))
-        self.processes = [Worker(self.listener) for i in range(self.numprocess)]
-    
+        self.processes=[]
+
     def start(self):
-        ROOT_LOGGER.info("Starting Worker processes")
-        for p in self.processes:
-            p.start()
+        ROOT_LOGGER.info("Setting up {0} Worker processes".format(self.numprocess))
+        self.populate_processes()
 
     def join(self):
         try:
-            for p in self.processes:
-                p.join()
+            while True:
+                self.maintain_processes()
+                sleep(0.1)
         except KeyboardInterrupt:
             ROOT_LOGGER.info("Initializing clean shutdown")
             self.shutdown()
 
+    def join_exited_processes(self):
+        cleaned = False
+        for i in reversed(range(len(self.processes))):
+            process = self.processes[i]
+            if process.exitcode is not None:
+                process.join()
+                if process.exitcode>0:
+                    ROOT_LOGGER.critical("Worker process aborted with exitcode {0}".format(process.exitcode))
+                    ROOT_LOGGER.critical("If no other error was logged, this may be caused by an exception when loading the plugins.")
+                    exit(1)
+                cleaned = True
+                del self.processes[i]
+        return cleaned
+
+    def populate_processes(self):
+        for i in range(self.numprocess - len(self.processes)):
+            p = Worker(self.listener, self.maxage)
+            self.processes.append(p)
+            p.daemon = True
+            p.start()
+
+    def maintain_processes(self):
+        if self.join_exited_processes():
+            self.populate_processes()
 
     def shutdown(self):
         for p in self.processes:
@@ -71,8 +100,10 @@ class Worker(Process):
     """
     Waits for a job from a client and executes it.
     """
-    def __init__(self, listener):
+    def __init__(self, listener, maxage=None):
         self.listener = listener
+        self.maxage = maxage
+        self.completed = 0
         self.conn = None
         self.do_exit = Event()
         self.is_waiting = Event()
@@ -84,10 +115,15 @@ class Worker(Process):
     def run(self):
         self.logger = logging.getLogger("Worker{0}".format(self.pid))
         self.logger.info("Running Worker with PID {0}".format(self.pid))
-        pymime.plugin.load_plugins()
+        try:
+            pymime.plugin.load_plugins()
+        except:
+            #Logging doesn't work here
+            exit(1)
         self.plugins=pymime.plugin.PluginProvider.get_plugins()
         self.logger.info("Loaded Plugins: {0}".format(", ".join([plugin.name for plugin in self.plugins])))
-        while not self.do_exit.is_set():
+        error=False
+        while not self.do_exit.is_set() and (self.maxage is None or self.completed < self.maxage):
             self.is_waiting.set()
             # Don't ignore the Interrupt signal
             signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -100,12 +136,21 @@ class Worker(Process):
             data=self.conn.recv()
             message=email.message_from_string(data)
             for plugin in self.plugins:
-                message=plugin.parse(message)
+                try:
+                    message=plugin.parse(message)
+                except:
+                    error=True
+                    self.logger.exception("An Error occured in plugin {0}".format(plugin.name))
             data=message.as_string()
             self.logger.info("Sending data")
             self.conn.send(data)
             self.conn.close()
             self.logger.info("Connection closed")
+            self.completed+=1
+            if error:
+                self.logger.warning("An Error occured, restarting worker")
+                break
+        self.logger.info("Worker exits")
 
     def shutdown(self):
         self.logger.info("Shutting down worker")

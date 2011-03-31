@@ -20,6 +20,7 @@ import pymime.plugins
 from ConfigParser import SafeConfigParser
 import os
 
+
 class ConfigWrapper(object):
     def __init__(self, plugin_namespace=None):
         self.config=SafeConfigParser()
@@ -30,26 +31,30 @@ class ConfigWrapper(object):
         self.path=os.path.join(pymime.globals.CONFIGDIR,filename)
         if not os.path.isfile(self.path):
             if plugin_namespace:
-                self.path=os.path.join(os.path.abspath(pymime.plugins.__path__[0]),"plugin_"+plugin_namespace+".conf")
+                self.path=os.path.join(os.path.abspath(pymime.plugins.__path__[0]),"plugin_"+plugin_namespace+".conf.default")
             else:
                 self.path=os.path.join(os.path.abspath(os.path.dirname(__file__)),"pymime.conf.default")
             if not os.path.isfile(self.path):
                 raise IOError("No Configuration found")
         self.config.read(self.path)
+
     def __getattr__(self,name):
         if self.config.has_section(name):
             return SectionWrapper(self.config, name)
         else:
             raise AttributeError("No Section {0} in File {1}".format(name,self.path))
 
+
 class SectionWrapper(object):
     def __init__(self, config, section):
         self.config = config
         self.section = section
+
     def __getattr__(self,name):
         if self.config.has_option(self.section,name):
             return self.config.get(self.section,name)
         else:
             raise AttributeError
+
 
 mainconfig = ConfigWrapper()
