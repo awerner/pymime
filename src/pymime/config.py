@@ -44,6 +44,11 @@ class ConfigWrapper(object):
         else:
             raise AttributeError("No Section {0} in File {1}".format(name,self.path))
 
+    def __iter__(self):
+        sections = self.config.sections()
+        for section in sections:
+            yield SectionWrapper(self.config,section)
+
 
 class SectionWrapper(object):
     def __init__(self, config, section):
@@ -55,6 +60,14 @@ class SectionWrapper(object):
             return self.config.get(self.section,name)
         else:
             raise AttributeError
+
+    def __getitem__(self,name):
+        return self.__getattr__(name)
+
+    def __iter__(self):
+        options = self.config.options(self.section)
+        for option in options:
+            yield option
 
 
 mainconfig = ConfigWrapper()
