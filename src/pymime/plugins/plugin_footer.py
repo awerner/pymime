@@ -25,22 +25,39 @@ class Footer(PluginProvider):
     def __init__(self):
         super(Footer,self).__init__()
         self.defaultfile=self.config.footer.default
-        if self.defaultfile == "None":
-            self.defaultfile=None
-        elif not os.path.isabs(self.defaultfile):
-            self.defaultfile=self.prepend_plugin_path(self.defaultfile)
+        self.defaultfile=self.parse_path(self.defaultfile)
+        self.footer_map={}
+        self.build_footer_map()
 
-    def prepend_plugin_path(self,filename):
-        return os.path.join(os.path.abspath(pymime.plugins.__path__[0]),filename)
+    def parse_path(self,filename):
+        if filename == "None":
+            return None
+        if not os.path.isabs(filename):
+            return os.path.join(os.path.abspath(pymime.plugins.__path__[0]),filename)
+        else:
+            return filename
 
-    def parse( self, message, walk=True, rawfooter=None ):
+    def build_footer_map(self):
+        for option in self.config.map:
+            self.footer_map[option]=self.parse_path(self.config.map[option])
+
+    def parse( self, message ):
         # Load footerfile before walking through the parts
         # And pass the rawfooter to the parts
-        if walk and message.is_multipart():
+        try:
+            with open( filename ) as f:
+                rawfooter = f.read()
+        except:
+            self.logger.warning("Could not open Footer {0}".format(filename))
+        if message.is_multipart():
             for part in message.walk():
                 if part.get_content_type().startswith("text/"):
-                    self.parse(part)
-        filename = self.defaultfile
+                    self.parse_part(part)
+        else:
+            self.parse_part(message)
+        return message
+
+    def parse_part(self,message, rawfooter=None)
         footer = None
         orig_cs = message.get_content_charset()
         if orig_cs == None:
@@ -48,12 +65,6 @@ class Footer(PluginProvider):
             orig_cs = "ascii"
         else:
             cs = orig_cs
-        if not rawfooter:
-            try:
-                with open( filename ) as f:
-                    rawfooter = f.read()
-            except:
-                self.logger.warning("Could not open Footer {0}".format(filename))
         if rawfooter:
             try:
                 footer = rawfooter.decode( "utf-8" ).encode( cs )
