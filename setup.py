@@ -15,6 +15,7 @@ setup(name='PyMIME',
                     'pymime.plugins': ["*.conf.default", "footer.en"]},
       scripts=['src/pymimec', 'src/pymimed'],
       data_files=[("/etc/pymime", ["src/pymime/pymime.conf.default",
+                                   "src/pymime/plugins/plugin_attachment_service.conf.default",
                                    "src/pymime/plugins/plugin_footer.conf.default",
                                    "src/pymime/plugins/footer.en"])],
      )
