@@ -1,10 +1,20 @@
+[default]
+# This function is called to store the attachments when action=store.
+# The needed packages and modules must be importable.
+# The function returns a string that is appended to the message.
+# Default value: pymime.integration.django
+store-function=pymime.integration.django_store
+# Additional options to pass to the store-function. Can be of the following python
+# structures: string, number, tuple, list, dict, boolean, and None.
+# Default value: None
+store-function-options=None
 [policy-default]
 # Allowed values: allow, deny. allow means that the mime and ext options
 # work as a whitelist, deny means blacklisting. Default value: allow
 policy=allow
-# Possible actions for allowed attachements:
+# Possible actions for allowed attachments:
 # keep: do nothing
-# store: Remove the Attachement from the mail and use the attachment service
+# store: Remove the Attachment from the mail and use the attachment service
 # to store the attachment.
 # Default value: keep
 action=keep

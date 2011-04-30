@@ -18,6 +18,7 @@ from pymime.plugin import PluginProvider
 from StringIO import StringIO
 from email.generator import Generator
 import os
+import ast
 
 class AttachmentPolicy(object):
     def __init__(self, configsection):
@@ -90,8 +91,27 @@ class AttachmentService(PluginProvider):
     def __init__(self):
         super(AttachmentService,self).__init__()
         self.defaultpolicy=AttachmentPolicy(self.config["policy-default"])
+        self.store_function=self._get_store_function()
+        self.store_function_options=self._get_store_function_options()
         self.policy_map={}
         self.build_policy_map()
+
+    def _get_store_function(self):
+        try:
+            funcname=self.config["default"]["store-function"]
+            modname,sep,funcname=funcname.rpartition(".")
+            mod = __import__(modname, fromlist=[funcname])
+            return getattr(mod,funcname)
+        except:
+            self.logger.warning("store-function is invalid")
+            return False
+
+    def _get_store_function_options(self):
+        try:
+            return ast.literal_eval(self.config["default"]["store-function-options"])
+        except:
+            self.logger.warning("store-function-options invalid")
+            return None
 
     def build_policy_map(self):
         for option in self.config.map:
