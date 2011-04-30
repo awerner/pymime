@@ -10,7 +10,7 @@ policy=allow
 action=keep
 # Comma-seperated list of allowed content-types. Matches if the Content-Type
 # header starts with any of the entries in the list.
-# Default value: application/vnd.oasis.opendocument.,application/x-zip
+# Default value: application/vnd.oasis.opendocument.,application/x-zip,application/pdf
 mime=application/vnd.oasis.opendocument.,application/x-zip,application/pdf
 # Comma-seperated list of allowed file extensions. Matches if the Content-Disposition
 # filename param or the Content-Type name param ends with any of the entries in the list.

@@ -15,7 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pymime.plugin import PluginProvider
-import StringIO
+from StringIO import StringIO
 from email.generator import Generator
 import os
 
@@ -26,21 +26,21 @@ class AttachmentPolicy(object):
         self.max_size = self._parse_max_size(configsection["max_size"])
         self.mime = self._parse_list(configsection["mime"])
         self.ext = self._parse_list(configsection["ext"])
-    
+
     def _parse_policy(self, value):
         value = value.lower()
         if value in ["allow", "deny"]:
             return value
         else:
             raise ValueError("Unrecognized policy: {0}".format(value))
-    
+
     def _parse_action(self, value):
         value = value.lower()
         if value in ["keep","store"]:
             return value
         else:
             raise ValueError("Unrecognized action: {0}".format(value))
-    
+
     def _parse_max_size(self, value):
         if value.isdigit():
             return int(value)
@@ -53,12 +53,12 @@ class AttachmentPolicy(object):
                 raise ValueError("Unrecognized file size: {0}".format(value))
         else:
             raise ValueError("Unrecognized file size: {0}".format(value))
-    
+
     def _parse_list(self, value):#
         value = value.split(",")
         value = map(lambda s: s.strip(), value)
         return value
-    
+
     def check_mime_allowed(self,message):
         content_type = message.get_content_type()
         for mime in self.mime:
@@ -66,7 +66,7 @@ class AttachmentPolicy(object):
                 return self.policy=="allow"
         else:
             return self.policy!="allow"
-    
+
     def check_ext_allowed(self,message):
         filename = message.get_filename()
         for ext in self.ext:
@@ -74,7 +74,7 @@ class AttachmentPolicy(object):
                 return self.policy=="allow"
         else:
             return self.policy!="allow"
-    
+
     def check_size_allowed(self,message):
         fp = StringIO()
         g = Generator(fp)
@@ -106,7 +106,8 @@ class AttachmentService(PluginProvider):
                 if part.get_content_maintype()=="text":
                     payload.append(part)
             message.set_payload(None)
-            message.attach(payload)
+            for part in payload:
+                message.attach(part)
             return False
 
     def parse( self, message ):
@@ -124,11 +125,12 @@ class AttachmentService(PluginProvider):
                 ct = part.get_content_type()
                 if not ct.startswith("text/"):
                     part= self.parse_part(part, policy)
-                if part:
+                if part is not None:
                     payload.append(part)
             if policy.action=="keep":
                 message.set_payload(None)
-                message.attach(payload)
+                for part in payload:
+                    message.attach(part)
         return message
 
     def parse_part(self,message, policy):
