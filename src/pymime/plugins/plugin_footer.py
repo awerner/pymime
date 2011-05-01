@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#    Copyright 2011 Christian Lohmeier, Alexander Werner
+#    Copyright 2011 Christian Lohmaier, Alexander Werner
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -17,6 +17,7 @@
 from pymime.plugin import PluginProvider
 import pymime.plugins
 import os.path
+from pymime.utility import append_text
 
 class Footer(PluginProvider):
     name="Footer"
@@ -46,8 +47,6 @@ class Footer(PluginProvider):
             self.footer_map[option]=self.parse_path(self.config.footer[self.config.map[option]])
 
     def parse( self, message ):
-        # Load footerfile before walking through the parts
-        # And pass the rawfooter to the parts
         filename = self.defaultfile
         if "To" in message:
             if message["To"] in self.footer_map:
@@ -56,43 +55,11 @@ class Footer(PluginProvider):
             return message
         try:
             with open( filename ) as f:
-                rawfooter = f.read()
+                footer = f.read().decode("utf-8")
         except:
-            self.logger.warning("Could not open Footer {0}".format(filename))
-        if message.is_multipart():
-            for part in message.walk():
-                if part.get_content_type().startswith("text/"):
-                    self.parse_part(part, rawfooter)
-        else:
-            self.parse_part(message, rawfooter)
-        return message
-
-    def parse_part(self,message, rawfooter=None):
-        footer = None
-        orig_cs = message.get_content_charset()
-        if orig_cs == None:
-            cs = "iso-8859-15"
-            orig_cs = "ascii"
-        else:
-            cs = orig_cs
-        if rawfooter:
-            try:
-                footer = rawfooter.decode( "utf-8" ).encode( cs )
-            except:
-                cs = "utf-8"
-                footer = rawfooter.decode( "utf-8" ).encode( cs )
+            self.logger.warning("Could not open or decode Footer {0}".format(filename))
         if footer:
-            sep = "\n"
-            if footer.startswith( "\n" ):
-                sep = ""
-            payload = message.get_payload( decode = True ).decode( orig_cs ).encode( cs ) + sep + footer
-            try:
-                del message["MIME-Version"]
-            except:
-                pass
-            try:
-                del message["Content-Transfer-Encoding"]
-            except:
-                pass
-            message.set_payload( payload, cs )
+            if not footer.startswith("\n"):
+                footer="\n"+footer
+            append_text(message,footer)
         return message

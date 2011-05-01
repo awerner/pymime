@@ -2,8 +2,8 @@
 # This function is called to store the attachments when action=store.
 # The needed packages and modules must be importable.
 # The function returns a string that is appended to the message.
-# Default value: pymime.integration.django
-store-function=pymime.integration.django_store
+# Default value: pymime.integration.dummy_store
+store-function=pymime.integration.dummy_store
 # Additional options to pass to the store-function. Can be of the following python
 # structures: string, number, tuple, list, dict, boolean, and None.
 # Default value: None

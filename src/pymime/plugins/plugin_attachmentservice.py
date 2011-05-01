@@ -19,6 +19,7 @@ from StringIO import StringIO
 from email.generator import Generator
 import os
 import ast
+from pymime.utility import append_text
 
 class AttachmentPolicy(object):
     def __init__(self, configsection):
@@ -151,6 +152,16 @@ class AttachmentService(PluginProvider):
                 message.set_payload(None)
                 for part in payload:
                     message.attach(part)
+            elif policy.action=="store":
+                message.set_payload(None)
+                attachments=[]
+                for part in payload:
+                    ct = part.get_content_type()
+                    if ct.startswith("text/"):
+                        message.attach(part)
+                    else:
+                        attachments.append(part)
+                append_text(message,"\n--\n"+self.store_function(attachments, self.store_function_options))
         return message
 
     def parse_part(self,message, policy):

@@ -14,5 +14,5 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-def django_store(attachments):
+def dummy_store(attachments, options):
     return "Number of Attachments: {0}".format(len(attachments))
