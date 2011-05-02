@@ -133,7 +133,12 @@ class Worker(Process):
             signal.signal(signal.SIGINT, signal.SIG_IGN)
             self.is_waiting.clear()
             self.logger.info("Receiving data")
-            data=self.conn.recv()
+            try:
+                data=self.conn.recv()
+            except EOFError:
+                self.logger.warning("Connection to client lost. Restarting worker.")
+                self.conn.close()
+                break
             message=email.message_from_string(data)
             for plugin in self.plugins:
                 try:
@@ -143,7 +148,12 @@ class Worker(Process):
                     self.logger.exception("An Error occured in plugin {0}".format(plugin.name))
             data=message.as_string()
             self.logger.info("Sending data")
-            self.conn.send(data)
+            try:
+                self.conn.send(data)
+            except EOFError:
+                self.logger.warning("Connection to client lost. Restarting worker.")
+                self.conn.close()
+                break
             self.conn.close()
             self.logger.info("Connection closed")
             self.completed+=1
