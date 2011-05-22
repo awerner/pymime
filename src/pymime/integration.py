@@ -16,15 +16,16 @@
 import mimetypes
 import hashlib
 import os
+import sys
 
-def dummy_store(attachments, options):
+def dummy_store(attachments, headers, options):
     """
     Simple store-function that returns a text with the number of attachments
     and does nothing with them, so they are lost.
     """
     return "Number of Attachments: {0}".format(len(attachments))
 
-def flat_store(attachments,options):
+def flat_store(attachments, headers, options):
     """
     This store-function saves the detached attachments in the directory options["path"]
     (default: current working dir + store).
@@ -32,16 +33,16 @@ def flat_store(attachments,options):
     If specified, options["text_after"] is appended to the attachment list.
     """
     salt = ""
-    if hasattr(options,"salt"):
+    if "salt" in options:
         salt = options["salt"]
     path = os.path.join(os.getcwd(),"store")
-    if hasattr(options,"path"):
+    if "path" in options:
         path=options["path"]
     baseurl="http://localhost/"
-    if hasattr(options,"baseurl"):
+    if "baseurl" in options:
         baseurl=options["baseurl"]
     text_after=""
-    if hasattr(options, "text_after"):
+    if "text_after" in options:
         text_after=options["text_after"]
     footer="Number of allowed Attachments: {0}".format(len(attachments))
     for part in attachments:
@@ -67,3 +68,38 @@ def flat_store(attachments,options):
         footer+="\nAttachment: {0}".format(fullurl)
     footer+=text_after
     return footer
+
+def django_store(attachments, headers, options):
+    if not "project-path" in options and not "settings-module" in options:
+        raise AttributeError("Not properly configured.")
+    if "project-path" in options:
+        sys.path.append(options["project-path"])
+    if "settings-module" in options:
+        modname,sep,setname=options["settings-module"].rpartition(".") #@UnusedVariable
+        mod = __import__(modname, fromlist=[setname])
+        settings=getattr(mod,setname)
+    else:
+        import settings #@UnresolvedImport
+    from django.core.management import setup_environ
+    setup_environ(settings)
+    from pymime.django_app.pymime_attachmentservice.models import Mail, Attachment
+    from django.core.files.base import ContentFile
+    m=Mail()
+    m.subject=headers["Subject"]
+    m.sender=headers["From"]
+    m.receiver=headers["To"]
+    m.save()
+    for part in attachments:
+        a=Attachment()
+        a.mail=m
+        a.content_type=part.get_content_type()
+        filename = part.get_filename()
+        if not filename:
+            ext = mimetypes.guess_extension(a.content_type)
+            if not ext:
+                ext = '.bin'
+            filename = "{0}{1}".format("attachment",ext)
+        a.filename_orig = filename
+        a.file.save(a.filename_orig,ContentFile(part.get_payload(decode=True)),save=True)
+        a.save()
+    return ""

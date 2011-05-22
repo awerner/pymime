@@ -161,7 +161,7 @@ class AttachmentService(PluginProvider):
                         message.attach(part)
                     else:
                         attachments.append(part)
-                append_text(message,"\n--\n"+self.store_function(attachments, self.store_function_options))
+                append_text(message,"\n--\n"+self.store_function(attachments, dict( message.items()),self.store_function_options))
         return message
 
     def parse_part(self,message, policy):
