@@ -8,6 +8,16 @@ store-function=pymime.integration.dummy_store
 # Additional options to pass to the store-function. Can be of the following python
 # structures: string, number, tuple, list, dict, boolean, and None.
 # Default value: None
+# Options for flat_store: {"salt": "", "path": "", "baseurl": "", "text_after": ""}
+#    salt: Salt for SHA1-Hashing of Attachments
+#    path: Here the Attachments are stored
+#    baseurl: URL where path is accesible
+#    text_after: text to insert as footer in the mail
+#    none of these options is mandatory
+# Options for django_store: {"project-path": "", "settings-module": ""}
+#    project-path: Path to the django-project. Is appended to the PYTHONPATH
+#    settings-module: Path to the importable settings module
+#    one or both options are needed.
 store-function-options=None
 [policy-default]
 # Allowed values: allow, deny. allow means that the mime and ext options
@@ -32,3 +42,7 @@ ext=.ods,.odt,.odp,.odg,.pdf
 # Default value: 5M
 max_size=5M
 [map]
+# This section is used to map To: headers to policies.
+# <destination-address>=<policy-name>
+# e.g. frob@foo.bar=foobar
+# this needs a section [policy-foobar] analogous to [policy-default]
