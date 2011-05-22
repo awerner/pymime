@@ -6,3 +6,6 @@ dist/
 virt/
 build/
 MANIFEST
+integration/django_attachmentstore/static/*
+integration/django_attachmentstore/media/*
+integration/django_attachmentstore/sqlite.db
