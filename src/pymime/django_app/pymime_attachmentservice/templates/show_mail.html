@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<title>PyMIME Attachment Service</title>
+
+</head>
+
+<body>
+<h1>{{mail.subject}}</h1>
+<p>{{mail.sender}}</p>
+<p>{{mail.receiver}}</p>
+<p>{{mail.date}}</p>
+{% for attachment in mail.attachments.all %}
+<h2><a href="{{attachment.file.url}}">{{attachment.filename_orig}}</a></h2>
+<p>{{attachment.content_type}}</p>
+<p>{{attachment.file.size}}</p>
+{% endfor %}
+</body>
+
+</html>

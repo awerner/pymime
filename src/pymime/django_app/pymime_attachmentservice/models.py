@@ -4,11 +4,15 @@ import uuid
 from django.core.files.storage import FileSystemStorage
 
 class Mail(models.Model):
+    uuid=models.CharField(max_length=36, verbose_name="UUID", default=lambda:uuid.uuid4())
     subject = models.CharField( max_length = 255, verbose_name="subject" )
     sender = models.CharField( max_length = 255, verbose_name = "sender" )
     receiver = models.CharField( max_length = 255, verbose_name = "sent to" )
     date = models.DateTimeField(auto_now_add=True)
     max_age = models.IntegerField(default=30)
+    @models.permalink
+    def get_absolute_url(self):
+        return ('pymime.django_app.pymime_attachmentservice.views.show_mail', [str(self.uuid)])
     def delete(self, *args, **kwargs):
         for a in self.attachments.all():
             a.delete()

@@ -72,6 +72,9 @@ def flat_store(attachments, headers, options):
 def django_store(attachments, headers, options):
     if not "project-path" in options and not "settings-module" in options:
         raise AttributeError("Not properly configured.")
+    baseurl="http://localhost/"
+    if "baseurl" in options:
+        baseurl=options["baseurl"]
     if "project-path" in options:
         sys.path.append(options["project-path"])
     if "settings-module" in options:
@@ -102,4 +105,5 @@ def django_store(attachments, headers, options):
         a.filename_orig = filename
         a.file.save(a.filename_orig,ContentFile(part.get_payload(decode=True)),save=True)
         a.save()
-    return ""
+    url = "{0}{1}".format(baseurl.rstrip("/"), m.get_absolute_url())
+    return "Attachments are available at {0}".format(url)
