@@ -1,6 +1,7 @@
 from django.db import models
 import os
 import uuid
+from django.core.files.storage import FileSystemStorage
 
 class Mail(models.Model):
     subject = models.CharField( max_length = 255, verbose_name="subject" )
@@ -8,6 +9,10 @@ class Mail(models.Model):
     receiver = models.CharField( max_length = 255, verbose_name = "sent to" )
     date = models.DateTimeField(auto_now_add=True)
     max_age = models.IntegerField(default=30)
+    def delete(self, *args, **kwargs):
+        for a in self.attachments.all():
+            a.delete()
+        super(Mail, self).delete(*args, **kwargs)
     def __unicode__(self):
         return "{0} from {1} to {2} on {3}".format(self.subject,self.sender,self.receiver,self.date)
     class Meta:
@@ -24,11 +29,28 @@ def _attachment_upload_to(instance, filename):
             filename="{0}.{1}".format(filename[0:99-(len(ext)+1)],ext)
     return os.path.join(str(uuid.uuid4()),filename)
 
+class AttachmentStorage(FileSystemStorage):
+    def delete(self, name):
+        super(AttachmentStorage,self).delete(name)
+        dir=os.path.dirname(name)
+        if dir:
+            cwd = os.getcwd()
+            os.chdir(self.location)
+            try:
+                os.removedirs(dir)
+            except OSError:
+                # Leaf directory not empty
+                pass
+            os.chdir(cwd)
+
 class Attachment( models.Model ):
     mail = models.ForeignKey(Mail, related_name="attachments")
     content_type = models.CharField( max_length = 255, verbose_name = "content-type" )
-    file = models.FileField(max_length=255, upload_to=_attachment_upload_to)
+    file = models.FileField(max_length=255, upload_to=_attachment_upload_to, storage=AttachmentStorage())
     filename_orig = models.CharField(max_length=255, verbose_name="original filename")
+    def delete(self, *args, **kwargs):
+        self.file.delete()
+        super(Attachment, self).delete(*args, **kwargs)
     def __unicode__( self ):
         return self.filename_orig
     class Meta:
