@@ -2,16 +2,16 @@ from django.db import models
 import os
 import uuid
 from django.core.files.storage import FileSystemStorage
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.core import urlresolvers
 
 class Mail(models.Model):
-    uuid = models.CharField(max_length=36, verbose_name="UUID", default=lambda:uuid.uuid4())
+    uuid = models.CharField(max_length=36, verbose_name="UUID", default=lambda:uuid.uuid4(), editable=False)
     subject = models.CharField( max_length = 255, verbose_name="subject" )
     sender = models.CharField( max_length = 255, verbose_name = "sender" )
     receiver = models.CharField( max_length = 255, verbose_name = "sent to" )
     date = models.DateTimeField(auto_now_add=True)
-    max_age = models.IntegerField(default=30)
+    max_age = models.IntegerField(default=30,help_text="Maximum age of the mail and its attachment in days.")
     archive_url = models.URLField(verify_exists=False,blank=True,max_length=255)
     def max_age_date (self):
         if self.max_age > 0:
@@ -23,6 +23,13 @@ class Mail(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('pymime.django_app.pymime_attachmentservice.views.show_mail', [str(self.uuid)])
+    def expire(self):
+        if self.max_age>0:
+            valid_until=self.date+timedelta(days=self.max_age)
+            if valid_until<datetime.now():
+                self.delete()
+                return True
+        return False
     def delete(self, *args, **kwargs):
         for a in self.attachments.all():
             a.delete()
