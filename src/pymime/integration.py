@@ -91,6 +91,8 @@ def django_store(attachments, headers, options):
     m.subject=headers["Subject"]
     m.sender=headers["From"]
     m.receiver=headers["To"]
+    if "Archived-At" in headers:
+        m.archive_url=headers["Archived-At"].strip("<>")
     m.save()
     for part in attachments:
         a=Attachment()

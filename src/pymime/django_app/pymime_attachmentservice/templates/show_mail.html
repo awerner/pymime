@@ -1,23 +1,34 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
 "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
-
+<link rel="stylesheet" href="{{ STATIC_URL }}default.css" media="screen" />
 <title>PyMIME Attachment Service</title>
-
 </head>
-
 <body>
-<h1>{{mail.subject}}</h1>
-<p>{{mail.sender}}</p>
-<p>{{mail.receiver}}</p>
-<p>{{mail.date}}</p>
+<div id="site">
+<div id="header">
+<h1><span class="green">Py</span>MIME</h1>
+<strong>Mail Attachment Service</strong>
+</div>
+<h2>{{mail.subject}}</h2>
+<p><strong>Sender: </strong>{{mail.sender}}<br />
+<strong>Receiver: </strong>{{mail.receiver}}<br />
+<strong>Date: </strong>{{mail.date}}<br />
+<strong>Attachments available until: </strong>{{mail.max_age_date}}
+{% if mail.archive_url %}
+<br />Original mail available in the mail archive <a href="{{mail.archive_url}}">here</a>.
+{% endif %}
+</p>
+<h3>Attachments</h3>
 {% for attachment in mail.attachments.all %}
-<h2><a href="{{attachment.file.url}}">{{attachment.filename_orig}}</a></h2>
-<p>{{attachment.content_type}}</p>
-<p>{{attachment.file.size}}</p>
+<h4><a href="{{attachment.file.url}}">{{attachment.filename_orig}}</a></h4>
+<p><strong>Content-type: </strong>{{attachment.content_type}}<br />
+<strong>File size: </strong>{{attachment.printsize}}</p>
 {% endfor %}
+<div id="footer">
+<a href="{{ mail.get_admin_url }}">Admin</a>
+</div>
+</div>
 </body>
-
 </html>

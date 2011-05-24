@@ -1,4 +1,5 @@
 recursive-include src/pymime *.py *.conf.default
 recursive-include src/pymime/django_app/pymime_attachmentservice/templates *
+recursive-include src/pymime/django_app/pymime_attachmentservice/static *
 include src/pymime/plugins/footer.en
 include src/pymimec src/pymimed

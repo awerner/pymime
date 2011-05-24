@@ -2,14 +2,24 @@ from django.db import models
 import os
 import uuid
 from django.core.files.storage import FileSystemStorage
+from datetime import timedelta
+from django.core import urlresolvers
 
 class Mail(models.Model):
-    uuid=models.CharField(max_length=36, verbose_name="UUID", default=lambda:uuid.uuid4())
+    uuid = models.CharField(max_length=36, verbose_name="UUID", default=lambda:uuid.uuid4())
     subject = models.CharField( max_length = 255, verbose_name="subject" )
     sender = models.CharField( max_length = 255, verbose_name = "sender" )
     receiver = models.CharField( max_length = 255, verbose_name = "sent to" )
     date = models.DateTimeField(auto_now_add=True)
     max_age = models.IntegerField(default=30)
+    archive_url = models.URLField(verify_exists=False,blank=True,max_length=255)
+    def max_age_date (self):
+        if self.max_age > 0:
+            return self.date+timedelta(days=self.max_age)
+        else:
+            return "indefinite"
+    def get_admin_url(self):
+        return urlresolvers.reverse('admin:pymime_attachmentservice_mail_change', args=(self.id,))
     @models.permalink
     def get_absolute_url(self):
         return ('pymime.django_app.pymime_attachmentservice.views.show_mail', [str(self.uuid)])
@@ -52,6 +62,20 @@ class Attachment( models.Model ):
     content_type = models.CharField( max_length = 255, verbose_name = "content-type" )
     file = models.FileField(max_length=255, upload_to=_attachment_upload_to, storage=AttachmentStorage())
     filename_orig = models.CharField(max_length=255, verbose_name="original filename")
+    def printsize(self):
+        if self.file.size > 1024**3:
+            size = "{0:.3}".format(self.file.size/float(1024**3))
+            ext = "GiB"
+        elif self.file.size > 1024**2:
+            size = "{0:.3}".format(self.file.size/float(1024**2))
+            ext = "MiB"
+        elif self.file.size > 1024:
+            size = "{0:.3}".format(self.file.size/float(1024))
+            ext = "KiB"
+        else:
+            size = self.file.size
+            ext = "B"
+        return "{0} {1}".format(size,ext)
     def delete(self, *args, **kwargs):
         self.file.delete()
         super(Attachment, self).delete(*args, **kwargs)
