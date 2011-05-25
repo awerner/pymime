@@ -15,3 +15,17 @@ en=footer.en
 # e.g. frob@foo.bar=de
 # If you have a default footer and want to deactivate it for a destination,
 # set the footer-name to None
+[template_identifiers]
+# This section is used to build custom identifiers that can be accessed in footers.
+# To access an identifier in a footer, use this syntax: ${identifier}
+# By default, every header of the parsed mail can be accessed as identifier.
+# <identifier>=<eval>
+# e.g. custom_string="FOOBAR"
+# The <eval>-value is evaluated as python expression.
+# To avoid security risks, the environment used to evaluate the expression is restricted.
+# to accessing the headers of the mail like this: header["To"]
+# You can use string methods and functions from email.utils to get the parts of the header you want.
+# See http://docs.python.org/library/stdtypes.html#string-methods and
+# http://docs.python.org/library/email.util.html for details
+to_local_part=parseaddr(header["To"])[1].partition("@")[0]
+to_domain_part=parseaddr(header["To"])[1].partition("@")[2]

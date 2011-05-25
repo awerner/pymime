@@ -18,6 +18,11 @@ from pymime.plugin import PluginProvider
 import pymime.plugins
 import os.path
 from pymime.utility import append_text
+import email.utils
+from string import Template
+
+allowedlocals={}
+allowedlocals.update(dict((name,getattr(email.utils,name))for name in email.utils.__all__))
 
 class Footer(PluginProvider):
     name="Footer"
@@ -29,7 +34,9 @@ class Footer(PluginProvider):
         self.defaultfile=self.config.footer.default
         self.defaultfile=self.parse_path(self.defaultfile)
         self.footer_map={}
+        self.template_map={}
         self.build_footer_map()
+        self.build_template_map()
 
     def parse_path(self,filename):
         if filename == "None":
@@ -46,6 +53,22 @@ class Footer(PluginProvider):
         for option in self.config.map:
             self.footer_map[option]=self.parse_path(self.config.footer[self.config.map[option]])
 
+    def build_template_map(self):
+        for option in self.config.template_identifiers:
+            self.template_map[option]=self.config.template_identifiers[option]
+
+    def generate_identifiers(self,message):
+        identifiers = {}
+        for identifier,value in message.items():
+            identifiers[identifier]=value
+        for identifier,code in self.template_map.items():
+            headerlocal=[("header", dict(message.items())),]
+            try:
+                identifiers[identifier]=eval(code,{"__builtins__":None},dict(allowedlocals.items()+headerlocal))
+            except:
+                self.logger.exception("An exception occurred while parsing the template identifier {0}:".format(identifier))
+        return identifiers
+
     def parse( self, message ):
         filename = self.defaultfile
         if "To" in message:
@@ -59,6 +82,9 @@ class Footer(PluginProvider):
         except:
             self.logger.warning("Could not open or decode Footer {0}".format(filename))
         if footer:
+            identifiers=self.generate_identifiers(message)
+            template = Template(footer)
+            footer = template.safe_substitute(identifiers)
             if not footer.startswith("\n"):
                 footer="\n"+footer
             append_text(message,footer)
