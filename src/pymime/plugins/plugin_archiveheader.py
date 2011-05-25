@@ -18,21 +18,21 @@ from pymime.plugin import PluginProvider
 import base64, hashlib, email.utils
 
 class ArchiveHeader(PluginProvider):
-    name="ArchiveHeader"
-    order=1
-    hasconfig=False
+    name = "ArchiveHeader"
+    order = 1
+    hasconfig = False
 
-    def parse( self, message ):
+    def parse(self, message):
         """
         Add mail-archive.com direct-link to archive http://www.mail-archive.com/faq.html#listserver
         """
         message_id = message['message-id']
         list_post = email.utils.parseaddr(message['to'])
-        if ( message_id is not None ) and ( list_post[1] is not '' ):
+        if (message_id is not None) and (list_post[1] is not ''):
             # remove < and > from msg-id
-            sha = hashlib.sha1( message_id[1:-1] )
-            sha.update( list_post[1] )
-            hash = base64.urlsafe_b64encode( sha.digest() )
+            sha = hashlib.sha1(message_id[1:-1])
+            sha.update(list_post[1])
+            hash = base64.urlsafe_b64encode(sha.digest())
             url = "<http://go.mail-archive.com/%s>" % hash
             message['Archived-At'] = url
             # in case debugging is needed

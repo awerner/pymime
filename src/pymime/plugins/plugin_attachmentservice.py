@@ -38,7 +38,7 @@ class AttachmentPolicy(object):
 
     def _parse_action(self, value):
         value = value.lower()
-        if value in ["keep","store"]:
+        if value in ["keep", "store"]:
             return value
         else:
             raise ValueError("Unrecognized action: {0}".format(value))
@@ -47,9 +47,9 @@ class AttachmentPolicy(object):
         if value.isdigit():
             return int(value)
         elif value[:-1].isdigit():
-            if value[-1:].lower() in ["k","m","g"]:
-                map = {"k":1024, "m":1024**2, "g":1024**3}
-                value=int(value[:-1])*map[value[-1:].lower()]
+            if value[-1:].lower() in ["k", "m", "g"]:
+                map = {"k":1024, "m":1024 ** 2, "g":1024 ** 3}
+                value = int(value[:-1]) * map[value[-1:].lower()]
                 return value
             else:
                 raise ValueError("Unrecognized file size: {0}".format(value))
@@ -61,48 +61,48 @@ class AttachmentPolicy(object):
         value = map(lambda s: s.strip(), value)
         return value
 
-    def check_mime_allowed(self,message):
+    def check_mime_allowed(self, message):
         content_type = message.get_content_type()
         for mime in self.mime:
             if content_type.startswith(mime):
-                return self.policy=="allow"
+                return self.policy == "allow"
         else:
-            return self.policy!="allow"
+            return self.policy != "allow"
 
-    def check_ext_allowed(self,message):
+    def check_ext_allowed(self, message):
         filename = message.get_filename()
         for ext in self.ext:
             if filename.endswith(ext):
-                return self.policy=="allow"
+                return self.policy == "allow"
         else:
-            return self.policy!="allow"
+            return self.policy != "allow"
 
-    def check_size_allowed(self,message):
+    def check_size_allowed(self, message):
         fp = StringIO()
         g = Generator(fp)
         g.flatten(message)
         fp.seek(0, os.SEEK_END)
-        return fp.tell()<=self.max_size
+        return fp.tell() <= self.max_size
 
 class AttachmentService(PluginProvider):
-    name="AttachmentService"
-    order=3
-    hasconfig=True
+    name = "AttachmentService"
+    order = 3
+    hasconfig = True
 
     def __init__(self):
-        super(AttachmentService,self).__init__()
-        self.defaultpolicy=AttachmentPolicy(self.config["policy-default"])
-        self.store_function=self._get_store_function()
-        self.store_function_options=self._get_store_function_options()
-        self.policy_map={}
+        super(AttachmentService, self).__init__()
+        self.defaultpolicy = AttachmentPolicy(self.config["policy-default"])
+        self.store_function = self._get_store_function()
+        self.store_function_options = self._get_store_function_options()
+        self.policy_map = {}
         self.build_policy_map()
 
     def _get_store_function(self):
         try:
-            funcname=self.config["default"]["store-function"]
-            modname,sep,funcname=funcname.rpartition(".")
-            mod = __import__(modname, fromlist=[funcname])
-            return getattr(mod,funcname)
+            funcname = self.config["default"]["store-function"]
+            modname, sep, funcname = funcname.rpartition(".")
+            mod = __import__(modname, fromlist = [funcname])
+            return getattr(mod, funcname)
         except:
             self.logger.warning("store-function is invalid")
             return False
@@ -116,22 +116,22 @@ class AttachmentService(PluginProvider):
 
     def build_policy_map(self):
         for option in self.config.map:
-            self.policy_map[option]=AttachmentPolicy(self.config["policy-"+self.config.map[option]])
+            self.policy_map[option] = AttachmentPolicy(self.config["policy-" + self.config.map[option]])
 
-    def check_size(self, message,policy):
+    def check_size(self, message, policy):
         if policy.check_size_allowed(message):
             return True
         else:
             payload = []
             for part in message.get_payload():
-                if part.get_content_maintype()=="text":
+                if part.get_content_maintype() == "text":
                     payload.append(part)
             message.set_payload(None)
             for part in payload:
                 message.attach(part)
             return False
 
-    def parse( self, message ):
+    def parse(self, message):
         policy = self.defaultpolicy
         if "To" in message:
             if message["To"] in self.policy_map:
@@ -139,32 +139,32 @@ class AttachmentService(PluginProvider):
         if not policy:
             return message
         if message.is_multipart():
-            if not self.check_size(message,policy):
+            if not self.check_size(message, policy):
                 return message
-            payload=[]
+            payload = []
             for part in message.walk():
                 ct = part.get_content_type()
                 if not ct.startswith("text/"):
-                    part= self.parse_part(part, policy)
+                    part = self.parse_part(part, policy)
                 if part is not None:
                     payload.append(part)
-            if policy.action=="keep":
+            if policy.action == "keep":
                 message.set_payload(None)
                 for part in payload:
                     message.attach(part)
-            elif policy.action=="store":
+            elif policy.action == "store":
                 message.set_payload(None)
-                attachments=[]
+                attachments = []
                 for part in payload:
                     ct = part.get_content_type()
                     if ct.startswith("text/"):
                         message.attach(part)
                     else:
                         attachments.append(part)
-                append_text(message,"\n--\n"+self.store_function(attachments, dict( message.items()),self.store_function_options))
+                append_text(message, "\n--\n" + self.store_function(attachments, dict(message.items()), self.store_function_options))
         return message
 
-    def parse_part(self,message, policy):
+    def parse_part(self, message, policy):
         if not(policy.check_mime_allowed(message) and
                policy.check_ext_allowed(message)):
             return None

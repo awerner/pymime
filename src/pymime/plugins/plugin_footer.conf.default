@@ -9,12 +9,16 @@
 # To deactivate the default footer, set it to None
 default=footer.en
 en=footer.en
+
+
 [map]
 # This section is used to map To: headers to footer-names.
 # <destination-address>=<footer-name>
 # e.g. frob@foo.bar=de
 # If you have a default footer and want to deactivate it for a destination,
 # set the footer-name to None
+
+
 [template_identifiers]
 # This section is used to build custom identifiers that can be accessed in footers.
 # To access an identifier in a footer, use this syntax: ${identifier}

@@ -35,77 +35,77 @@ def flat_store(attachments, headers, options):
     salt = ""
     if "salt" in options:
         salt = options["salt"]
-    path = os.path.join(os.getcwd(),"store")
+    path = os.path.join(os.getcwd(), "store")
     if "path" in options:
-        path=options["path"]
-    baseurl="http://localhost/"
+        path = options["path"]
+    baseurl = "http://localhost/"
     if "baseurl" in options:
-        baseurl=options["baseurl"]
-    text_after=""
+        baseurl = options["baseurl"]
+    text_after = ""
     if "text_after" in options:
-        text_after=options["text_after"]
-    footer="Number of allowed Attachments: {0}".format(len(attachments))
+        text_after = options["text_after"]
+    footer = "Number of allowed Attachments: {0}".format(len(attachments))
     for part in attachments:
         filename = part.get_filename()
         if not filename:
             ext = mimetypes.guess_extension(part.get_content_type())
             if not ext:
                 ext = '.bin'
-            filename = "{0}{1}".format("attachment",ext)
+            filename = "{0}{1}".format("attachment", ext)
         h = hashlib.sha1(salt) #@UndefinedVariable
-        h.update(part.get_payload(decode=True))
+        h.update(part.get_payload(decode = True))
         hex = h.hexdigest()
-        dir = os.path.join(path,hex)
-        filepath=os.path.join(dir,filename)
+        dir = os.path.join(path, hex)
+        filepath = os.path.join(dir, filename)
         try:
             os.makedirs(dir)
         except os.error:
             pass
         fp = open(filepath, 'wb')
-        fp.write(part.get_payload(decode=True))
+        fp.write(part.get_payload(decode = True))
         fp.close()
-        fullurl="{0}{1}/{2}".format(baseurl,hex,filename)
-        footer+="\nAttachment: {0}".format(fullurl)
-    footer+=text_after
+        fullurl = "{0}{1}/{2}".format(baseurl, hex, filename)
+        footer += "\nAttachment: {0}".format(fullurl)
+    footer += text_after
     return footer
 
 def django_store(attachments, headers, options):
     if not "project-path" in options and not "settings-module" in options:
         raise AttributeError("Not properly configured.")
-    baseurl="http://localhost/"
+    baseurl = "http://localhost/"
     if "baseurl" in options:
-        baseurl=options["baseurl"]
+        baseurl = options["baseurl"]
     if "project-path" in options:
         sys.path.append(options["project-path"])
     if "settings-module" in options:
-        modname,sep,setname=options["settings-module"].rpartition(".") #@UnusedVariable
-        mod = __import__(modname, fromlist=[setname])
-        settings=getattr(mod,setname)
+        modname, sep, setname = options["settings-module"].rpartition(".") #@UnusedVariable
+        mod = __import__(modname, fromlist = [setname])
+        settings = getattr(mod, setname)
     else:
         import settings #@UnresolvedImport
     from django.core.management import setup_environ
     setup_environ(settings)
     from pymime.django_app.pymime_attachmentservice.models import Mail, Attachment
     from django.core.files.base import ContentFile
-    m=Mail()
-    m.subject=headers["Subject"]
-    m.sender=headers["From"]
-    m.receiver=headers["To"]
+    m = Mail()
+    m.subject = headers["Subject"]
+    m.sender = headers["From"]
+    m.receiver = headers["To"]
     if "Archived-At" in headers:
-        m.archive_url=headers["Archived-At"].strip("<>")
+        m.archive_url = headers["Archived-At"].strip("<>")
     m.save()
     for part in attachments:
-        a=Attachment()
-        a.mail=m
-        a.content_type=part.get_content_type()
+        a = Attachment()
+        a.mail = m
+        a.content_type = part.get_content_type()
         filename = part.get_filename()
         if not filename:
             ext = mimetypes.guess_extension(a.content_type)
             if not ext:
                 ext = '.bin'
-            filename = "{0}{1}".format("attachment",ext)
+            filename = "{0}{1}".format("attachment", ext)
         a.filename_orig = filename
-        a.file.save(a.filename_orig,ContentFile(part.get_payload(decode=True)),save=True)
+        a.file.save(a.filename_orig, ContentFile(part.get_payload(decode = True)), save = True)
         a.save()
     url = "{0}{1}".format(baseurl.rstrip("/"), m.get_absolute_url())
     return "Attachments are available at {0}".format(url)

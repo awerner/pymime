@@ -21,27 +21,27 @@ from pymime.config import mainconfig
 import sys
 
 parser = OptionParser()
-parser.add_option( "-i", "--input", dest = "input", default = "-",
-                   help = "Where to read the mail from. Defaults to STDIN" )
-parser.add_option( "-o", "--output", dest = "output", default = "-",
-                   help = "Where to write the transformed mail. Defaults to STDOUT" )
+parser.add_option("-i", "--input", dest = "input", default = "-",
+                   help = "Where to read the mail from. Defaults to STDIN")
+parser.add_option("-o", "--output", dest = "output", default = "-",
+                   help = "Where to write the transformed mail. Defaults to STDOUT")
 options, args = parser.parse_args()
 
 if options.input == "-":
     input = sys.stdin
 else:
-    input = file( options.input )
+    input = file(options.input)
 
 if options.output == "-":
     output = sys.stdout
 else:
-    output = file( options.output, "w" )
+    output = file(options.output, "w")
 
 address = (mainconfig.client.host, int(mainconfig.client.port))
-conn = multiprocessing.connection.Client(address, authkey=mainconfig.client.authkey)
+conn = multiprocessing.connection.Client(address, authkey = mainconfig.client.authkey)
 
 conn.send(input.read())
 input.close()
-output.write( conn.recv())
+output.write(conn.recv())
 conn.close()
 output.close()

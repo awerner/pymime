@@ -14,11 +14,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-def append_text(message,text):
+def append_text(message, text):
     if message.is_multipart():
         for part in message.walk():
             if part.get_content_type().startswith("text/"):
-                append_text(part,text)
+                append_text(part, text)
         return
     orig_cs = message.get_content_charset()
     if orig_cs == None:
@@ -27,11 +27,11 @@ def append_text(message,text):
     else:
         cs = orig_cs
     try:
-        text = text.decode( "utf-8" ).encode( cs )
+        text = text.decode("utf-8").encode(cs)
     except:
         cs = "utf-8"
-        text = text.decode( "utf-8" ).encode( cs )
-    payload = message.get_payload( decode = True ).decode( orig_cs ).encode( cs ) + text
+        text = text.decode("utf-8").encode(cs)
+    payload = message.get_payload(decode = True).decode(orig_cs).encode(cs) + text
     try:
         del message["MIME-Version"]
     except:
@@ -40,4 +40,4 @@ def append_text(message,text):
         del message["Content-Transfer-Encoding"]
     except:
         pass
-    message.set_payload( payload, cs )
+    message.set_payload(payload, cs)

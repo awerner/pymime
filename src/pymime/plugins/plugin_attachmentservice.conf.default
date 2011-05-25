@@ -5,6 +5,7 @@
 # Default value: pymime.integration.dummy_store
 # Other Options pymime.integration.{flat_store,django_store} 
 store-function=pymime.integration.dummy_store
+
 # Additional options to pass to the store-function. Can be of the following python
 # structures: string, number, tuple, list, dict, boolean, and None.
 # Default value: None
@@ -19,28 +20,36 @@ store-function=pymime.integration.dummy_store
 #    settings-module: Path to the importable settings module
 #    one or both options are needed.
 store-function-options=None
+
+
 [policy-default]
 # Allowed values: allow, deny. allow means that the mime and ext options
 # work as a whitelist, deny means blacklisting. Default value: allow
 policy=allow
+
 # Possible actions for allowed attachments:
 # keep: do nothing
 # store: Remove the Attachment from the mail and use the attachment service
 # to store the attachment.
 # Default value: keep
 action=keep
+
 # Comma-seperated list of allowed content-types. Matches if the Content-Type
 # header starts with any of the entries in the list.
 # Default value: application/vnd.oasis.opendocument.,application/x-zip,application/pdf
 mime=application/vnd.oasis.opendocument.,application/x-zip,application/pdf
+
 # Comma-seperated list of allowed file extensions. Matches if the Content-Disposition
 # filename param or the Content-Type name param ends with any of the entries in the list.
 # Default value: .ods,.odt,.odp,.odg,.pdf
 ext=.ods,.odt,.odp,.odg,.pdf
+
 # Maximum allowed size of the overall mail, including encoding overhead.
 # Allowed extensions: K/M/G
 # Default value: 5M
 max_size=5M
+
+
 [map]
 # This section is used to map To: headers to policies.
 # <destination-address>=<policy-name>

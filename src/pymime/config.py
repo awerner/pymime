@@ -22,35 +22,35 @@ import os
 
 
 class ConfigWrapper(object):
-    def __init__(self, plugin_namespace=None):
-        self.config=SafeConfigParser()
+    def __init__(self, plugin_namespace = None):
+        self.config = SafeConfigParser()
         if plugin_namespace:
-            filename="plugin_"+plugin_namespace+".conf"
+            filename = "plugin_" + plugin_namespace + ".conf"
         else:
-            filename="pymime.conf"
-        self.path=os.path.join(pymime.globals.CONFIGDIR,filename)
+            filename = "pymime.conf"
+        self.path = os.path.join(pymime.globals.CONFIGDIR, filename)
         if not os.path.isfile(self.path):
             if plugin_namespace:
-                self.path=os.path.join(os.path.abspath(pymime.plugins.__path__[0]),"plugin_"+plugin_namespace+".conf.default")
+                self.path = os.path.join(os.path.abspath(pymime.plugins.__path__[0]), "plugin_" + plugin_namespace + ".conf.default")
             else:
-                self.path=os.path.join(os.path.abspath(os.path.dirname(__file__)),"pymime.conf.default")
+                self.path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "pymime.conf.default")
             if not os.path.isfile(self.path):
                 raise IOError("No Configuration found")
         self.config.read(self.path)
 
-    def __getattr__(self,name):
+    def __getattr__(self, name):
         if self.config.has_section(name):
             return SectionWrapper(self.config, name)
         else:
-            raise AttributeError("No Section {0} in File {1}".format(name,self.path))
-    
-    def __getitem__(self,name):
+            raise AttributeError("No Section {0} in File {1}".format(name, self.path))
+
+    def __getitem__(self, name):
         return self.__getattr__(name)
 
     def __iter__(self):
         sections = self.config.sections()
         for section in sections:
-            yield SectionWrapper(self.config,section)
+            yield SectionWrapper(self.config, section)
 
 
 class SectionWrapper(object):
@@ -58,13 +58,13 @@ class SectionWrapper(object):
         self.config = config
         self.section = section
 
-    def __getattr__(self,name):
-        if self.config.has_option(self.section,name):
-            return self.config.get(self.section,name)
+    def __getattr__(self, name):
+        if self.config.has_option(self.section, name):
+            return self.config.get(self.section, name)
         else:
             raise AttributeError
 
-    def __getitem__(self,name):
+    def __getitem__(self, name):
         return self.__getattr__(name)
 
     def __iter__(self):

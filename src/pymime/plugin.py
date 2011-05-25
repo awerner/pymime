@@ -27,41 +27,41 @@ class PluginRoot(type):
     """
     def __init__(cls, *args, **kwargs):
         if not hasattr(cls, 'plugins'):
-            cls.plugins=[]
+            cls.plugins = []
         else:
             cls.plugins.append(cls)
 
     def __order_plugins(cls):
-        cls.plugins = sorted(cls.plugins, key=lambda plugin: plugin.order)
+        cls.plugins = sorted(cls.plugins, key = lambda plugin: plugin.order)
 
     def get_plugins(cls, *args, **kwargs):
         """
         Return a list of instances of all registered plugins. Options can be passed to the constructors as parameters of this method.
         """
         cls.__order_plugins()
-        return [p(*args,**kwargs) for p in cls.plugins]
+        return [p(*args, **kwargs) for p in cls.plugins]
 
 
 class PluginProvider(object):
     """
     Parent of all Plugins.
     """
-    __metaclass__=PluginRoot
-    name="Metaplugin"
+    __metaclass__ = PluginRoot
+    name = "Metaplugin"
     """Name of the plugin. Must be overwritten."""
-    order=10
+    order = 10
     """Determines the order of parsing. The higher the later."""
-    hasconfig=False
+    hasconfig = False
     """
     True if the plugin has its own configuration file.
     The file will be loaded at instantiation and searched for in pymime.globals.CONFIGDIR and in the plugins directory with the name plugin_NAME.conf and plugin_NAME.conf.default repectively.
     """
-    config=None
+    config = None
     """
     An Instance of the pymime.config.ConfigWrapper for easy access to configuration values if the plugin has an own configuration file.
     """
     def __init__(self):
-        self.logger=logging.getLogger(self.name)
+        self.logger = logging.getLogger(self.name)
         if self.hasconfig:
             self.config = ConfigWrapper(self.name.lower())
     def parse(self, message):
@@ -70,9 +70,9 @@ class PluginProvider(object):
 
 
 def load_plugins():
-    package=pymime.plugins
+    package = pymime.plugins
     for importer, name, ispkg in pkgutil.walk_packages(
-        path=package.__path__,
-        prefix=package.__name__+".",
-        onerror=lambda x: None):
+        path = package.__path__,
+        prefix = package.__name__ + ".",
+        onerror = lambda x: None):
         __import__(name)

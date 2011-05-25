@@ -27,11 +27,11 @@ import signal
 import sys
 
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
-                    filename=mainconfig.daemon.logfile)
+logging.basicConfig(level = logging.DEBUG,
+                    format = '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
+                    filename = mainconfig.daemon.logfile)
 ROOT_LOGGER = logging.getLogger()
-ROOT_LOGGER.info(72*"=")
+ROOT_LOGGER.info(72 * "=")
 ROOT_LOGGER.info("Startup")
 
 
@@ -40,7 +40,7 @@ class ProcessManager(object):
     Runs the Worker processes that listen at the address.
     """
     address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
-    listener = Listener(address, authkey=mainconfig.daemon.authkey)
+    listener = Listener(address, authkey = mainconfig.daemon.authkey)
     maxage = int(mainconfig.daemon.max_process_age)
     try:
         numprocess = cpu_count()
@@ -48,8 +48,8 @@ class ProcessManager(object):
         numprocess = 1
 
     def __init__(self):
-        ROOT_LOGGER.info("Listening on {0}:{1}".format(mainconfig.daemon.host,mainconfig.daemon.port))
-        self.processes=[]
+        ROOT_LOGGER.info("Listening on {0}:{1}".format(mainconfig.daemon.host, mainconfig.daemon.port))
+        self.processes = []
 
     def start(self):
         ROOT_LOGGER.info("Setting up {0} Worker processes".format(self.numprocess))
@@ -70,7 +70,7 @@ class ProcessManager(object):
             process = self.processes[i]
             if process.exitcode is not None:
                 process.join()
-                if process.exitcode>0:
+                if process.exitcode > 0:
                     ROOT_LOGGER.critical("Worker process aborted with exitcode {0}".format(process.exitcode))
                     ROOT_LOGGER.critical("If no other error was logged, this may be caused by an exception when loading the plugins.")
                     exit(1)
@@ -100,7 +100,7 @@ class Worker(Process):
     """
     Waits for a job from a client and executes it.
     """
-    def __init__(self, listener, maxage=None):
+    def __init__(self, listener, maxage = None):
         self.listener = listener
         self.maxage = maxage
         self.completed = 0
@@ -109,7 +109,7 @@ class Worker(Process):
         self.is_waiting = Event()
         self.logger = logging.getLogger("Worker")
         self.plugins = None
-        super(Worker,self).__init__()
+        super(Worker, self).__init__()
         self.logger.info("Initializing Worker")
 
     def run(self):
@@ -120,9 +120,9 @@ class Worker(Process):
         except:
             #Logging doesn't work here
             exit(1)
-        self.plugins=pymime.plugin.PluginProvider.get_plugins()
+        self.plugins = pymime.plugin.PluginProvider.get_plugins()
         self.logger.info("Loaded Plugins: {0}".format(", ".join([plugin.name for plugin in self.plugins])))
-        error=False
+        error = False
         while not self.do_exit.is_set() and (self.maxage is None or self.completed < self.maxage):
             self.is_waiting.set()
             # Don't ignore the Interrupt signal
@@ -134,19 +134,19 @@ class Worker(Process):
             self.is_waiting.clear()
             self.logger.info("Receiving data")
             try:
-                data=self.conn.recv()
+                data = self.conn.recv()
             except EOFError:
                 self.logger.warning("Connection to client lost. Restarting worker.")
                 self.conn.close()
                 break
-            message=email.message_from_string(data)
+            message = email.message_from_string(data)
             for plugin in self.plugins:
                 try:
-                    message=plugin.parse(message)
+                    message = plugin.parse(message)
                 except:
-                    error=True
+                    error = True
                     self.logger.exception("An Error occured in plugin {0}".format(plugin.name))
-            data=message.as_string()
+            data = message.as_string()
             self.logger.info("Sending data")
             try:
                 self.conn.send(data)
@@ -156,7 +156,7 @@ class Worker(Process):
                 break
             self.conn.close()
             self.logger.info("Connection closed")
-            self.completed+=1
+            self.completed += 1
             if error:
                 self.logger.warning("An Error occured, restarting worker")
                 break
@@ -167,7 +167,7 @@ class Worker(Process):
         self.do_exit.set()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     p = ProcessManager()
     p.start()
     p.join()

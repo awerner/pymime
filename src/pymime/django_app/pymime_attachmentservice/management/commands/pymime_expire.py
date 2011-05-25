@@ -9,6 +9,6 @@ class Command(NoArgsCommand):
         for m in Mail.objects.all():
             id = m.id
             if m.expire():
-                counter+=1
+                counter += 1
                 self.stdout.write('Mail ID {0} expired.\n'.format(id))
         self.stdout.write('Removed {0} old mails.\n'.format(counter))
