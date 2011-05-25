@@ -33,16 +33,16 @@ def flat_store(attachments, headers, options, policy_options):
     If specified, options["text_after"] is appended to the attachment list.
     """
     salt = ""
-    if "salt" in options:
+    if options and "salt" in options:
         salt = options["salt"]
     path = os.path.join(os.getcwd(), "store")
-    if "path" in options:
+    if options and "path" in options:
         path = options["path"]
     baseurl = "http://localhost/"
-    if "baseurl" in options:
+    if options and "baseurl" in options:
         baseurl = options["baseurl"]
     text_after = ""
-    if "text_after" in options:
+    if options and "text_after" in options:
         text_after = options["text_after"]
     footer = "Number of allowed Attachments: {0}".format(len(attachments))
     for part in attachments:
@@ -70,7 +70,7 @@ def flat_store(attachments, headers, options, policy_options):
     return footer
 
 def django_store(attachments, headers, options, policy_options):
-    if not "project-path" in options and not "settings-module" in options:
+    if options and not "project-path" in options and not "settings-module" in options:
         raise AttributeError("Not properly configured.")
     baseurl = "http://localhost/"
     if "baseurl" in options:
@@ -91,7 +91,7 @@ def django_store(attachments, headers, options, policy_options):
     m.subject = headers["Subject"]
     m.sender = headers["From"]
     m.receiver = headers["To"]
-    if "max-age" in policy_options:
+    if policy_options and "max-age" in policy_options:
         m.max_age = int(policy_options["max-age"])
     if "Archived-At" in headers:
         m.archive_url = headers["Archived-At"].strip("<>")
