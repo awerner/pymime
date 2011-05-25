@@ -18,14 +18,14 @@ import hashlib
 import os
 import sys
 
-def dummy_store(attachments, headers, options):
+def dummy_store(attachments, headers, options, policy_options):
     """
     Simple store-function that returns a text with the number of attachments
     and does nothing with them, so they are lost.
     """
     return "Number of Attachments: {0}".format(len(attachments))
 
-def flat_store(attachments, headers, options):
+def flat_store(attachments, headers, options, policy_options):
     """
     This store-function saves the detached attachments in the directory options["path"]
     (default: current working dir + store).
@@ -69,7 +69,7 @@ def flat_store(attachments, headers, options):
     footer += text_after
     return footer
 
-def django_store(attachments, headers, options):
+def django_store(attachments, headers, options, policy_options):
     if not "project-path" in options and not "settings-module" in options:
         raise AttributeError("Not properly configured.")
     baseurl = "http://localhost/"
@@ -91,6 +91,8 @@ def django_store(attachments, headers, options):
     m.subject = headers["Subject"]
     m.sender = headers["From"]
     m.receiver = headers["To"]
+    if "max-age" in policy_options:
+        m.max_age = int(policy_options["max-age"])
     if "Archived-At" in headers:
         m.archive_url = headers["Archived-At"].strip("<>")
     m.save()

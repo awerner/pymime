@@ -28,6 +28,7 @@ class AttachmentPolicy(object):
         self.max_size = self._parse_max_size(configsection["max_size"])
         self.mime = self._parse_list(configsection["mime"])
         self.ext = self._parse_list(configsection["ext"])
+        self.store_function_options = self._parse_store_function_option(configsection["store-function-options"])
 
     def _parse_policy(self, value):
         value = value.lower()
@@ -60,6 +61,13 @@ class AttachmentPolicy(object):
         value = value.split(",")
         value = map(lambda s: s.strip(), value)
         return value
+
+    def _parse_store_function_option(self, value):
+        try:
+            return ast.literal_eval(value)
+        except:
+            self.logger.warning("store-function-options invalid")
+            return None
 
     def check_mime_allowed(self, message):
         content_type = message.get_content_type()
@@ -161,7 +169,7 @@ class AttachmentService(PluginProvider):
                         message.attach(part)
                     else:
                         attachments.append(part)
-                append_text(message, "\n--\n" + self.store_function(attachments, dict(message.items()), self.store_function_options))
+                append_text(message, "\n--\n" + self.store_function(attachments, dict(message.items()), self.store_function_options, policy.store_function_options))
         return message
 
     def parse_part(self, message, policy):

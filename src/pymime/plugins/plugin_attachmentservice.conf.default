@@ -15,10 +15,11 @@ store-function=pymime.integration.dummy_store
 #    baseurl: URL where path is accesible
 #    text_after: text to insert as footer in the mail
 #    none of these options is mandatory
-# Options for django_store: {"project-path": "", "settings-module": ""}
+# Options for django_store: {"project-path": "", "settings-module": "", "baseurl": ""}
 #    project-path: Path to the django-project. Is appended to the PYTHONPATH
 #    settings-module: Path to the importable settings module
-#    one or both options are needed.
+#    baseurl: URL where the django installation is accessible
+#    At least one of the project-path and settings-module options is needed.
 store-function-options=None
 
 
@@ -48,6 +49,13 @@ ext=.ods,.odt,.odp,.odg,.pdf
 # Allowed extensions: K/M/G
 # Default value: 5M
 max_size=5M
+
+# Policy options to pass to the store-function. Can be of the following python
+# structures: string, number, tuple, list, dict, boolean, and None.
+# Default value: None
+# Options for django_store: {"max-age": 30}
+#    max-age: Maximum time (in days) attachments are stored before they are expired.
+store-function-options=None
 
 
 [map]
