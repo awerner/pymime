@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+import distribute_setup
+distribute_setup.use_setuptools()
+from setuptools import setup, find_packages
 
 setup(name='PyMIME',
       version='0.2',
@@ -9,12 +11,22 @@ setup(name='PyMIME',
       author='Alexander Werner',
       author_email='alex@documentfoundation.org',
       url='https://github.com/awerner/pymime',
-      packages=['pymime',
-                'pymime.plugins',
-                'pymime.django_app',
-                'pymime.django_app.pymime_attachmentservice',
-                'pymime.django_app.pymime_attachmentservice.management',
-                'pymime.django_app.pymime_attachmentservice.management.commands',],
+      license="GPL",
+      classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console',
+        'Environment :: No Input/Output (Daemon)',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Operating System :: POSIX',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Topic :: Communications :: Email',
+        'Topic :: Communications :: Email :: Filters',
+        'Topic :: Utilities',
+        ],
+      install_requires = ["django"],
+      packages=find_packages(),
       package_data={'pymime': ["*.conf.default"],
                     'pymime.plugins': ["*.conf.default", "footer.en"],
                     'pymime.django_app.pymime_attachmentservice': ["templates/*", "static/*"]},

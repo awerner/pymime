@@ -9,3 +9,6 @@ MANIFEST
 integration/django_attachmentstore/static/*
 integration/django_attachmentstore/media/*
 integration/django_attachmentstore/sqlite.db
+distribute*.egg
+distribute*.tar.gz
+PyMIME.egg-info
