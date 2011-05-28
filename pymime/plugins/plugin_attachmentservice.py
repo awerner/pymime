@@ -41,7 +41,7 @@ class AttachmentPolicy(object):
 
     def _parse_policy(self, value):
         value = value.lower()
-        if value in ["allow", "deny"]:
+        if value in ["whitelist", "blacklist"]:
             return value
         else:
             raise ValueError("Unrecognized policy: {0}".format(value))
@@ -82,17 +82,17 @@ class AttachmentPolicy(object):
         content_type = message.get_content_type()
         for mime in self.mime:
             if content_type.startswith(mime):
-                return self.policy == "allow"
+                return self.policy == "whitelist"
         else:
-            return self.policy != "allow"
+            return self.policy != "whitelist"
 
     def check_ext_allowed(self, message):
         filename = message.get_filename()
         for ext in self.ext:
             if filename.endswith(ext):
-                return self.policy == "allow"
+                return self.policy == "whitelist"
         else:
-            return self.policy != "allow"
+            return self.policy != "whitelist"
 
     def check_size_allowed(self, message):
         fp = StringIO()

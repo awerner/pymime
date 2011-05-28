@@ -24,9 +24,13 @@ store-function-options=None
 
 
 [policy-default]
-# Allowed values: allow, deny. allow means that the mime and ext options
-# work as a whitelist, deny means blacklisting. Default value: allow
-policy=allow
+# Allowed values: whitelist, blacklist.
+# whitelist means that the mime and ext options work as a whitelist, both
+# mime and ext must be in the respective options for the attachment to be whitelisted.
+# blacklist: it is sufficient if one of mime and ext are in the respective options for the
+# attachment to be discarded.
+# Default value: whitelist
+policy=whitelist
 
 # Possible actions for allowed attachments:
 # keep: do nothing
