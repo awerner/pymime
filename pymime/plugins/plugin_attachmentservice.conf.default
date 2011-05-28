@@ -32,13 +32,6 @@ store-function-options=None
 # Default value: whitelist
 policy=whitelist
 
-# Possible actions for allowed attachments:
-# keep: do nothing
-# store: Remove the Attachment from the mail and use the attachment service
-# to store the attachment.
-# Default value: keep
-action=keep
-
 # Comma-seperated list of allowed content-types. Matches if the Content-Type
 # header starts with any of the entries in the list.
 # Default value: application/vnd.oasis.opendocument.,application/x-zip,application/pdf
@@ -60,6 +53,13 @@ max_size=5M
 # Options for django_store: {"max-age": 30}
 #    max-age: Maximum time (in days) attachments are stored before they are expired.
 store-function-options=None
+
+# Possible actions for *allowed* attachments:
+# keep: leave allowed attachments in the mail
+# store: Remove the attachment from the mail and use the attachment service
+# to store the attachment.
+# Default value: keep
+action=keep
 
 
 [map]
