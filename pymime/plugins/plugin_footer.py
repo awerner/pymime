@@ -72,8 +72,9 @@ class Footer(PluginProvider):
     def parse(self, message):
         filename = self.defaultfile
         if "To" in message:
-            if message["To"] in self.footer_map:
-                filename = self.footer_map[message["To"]]
+            addr = email.utils.parseaddr(message["To"])[1]
+            if addr in self.footer_map:
+                filename = self.footer_map[addr]
         if not filename:
             return message
         try:

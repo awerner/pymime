@@ -17,6 +17,7 @@
 from pymime.plugin import PluginProvider
 from StringIO import StringIO
 from email.generator import Generator
+from email.utils import parseaddr
 import os
 import ast
 from pymime.utility import append_text
@@ -151,8 +152,9 @@ class AttachmentService(PluginProvider):
     def parse(self, message):
         policy = self.defaultpolicy
         if "To" in message:
-            if message["To"] in self.policy_map:
-                policy = self.policy_map[message["To"]]
+            addr = parseaddr(message["To"])[1]
+            if addr in self.policy_map:
+                policy = self.policy_map[addr]
         if not policy:
             return message
         if message.is_multipart():
