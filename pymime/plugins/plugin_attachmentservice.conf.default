@@ -62,4 +62,5 @@ store-function-options=None
 # This section is used to map To: headers to policies.
 # <destination-address>=<policy-name>
 # e.g. frob@foo.bar=foobar
-# this needs a section [policy-foobar] analogous to [policy-default]
+# this needs a section [policy-foobar] analogous to [policy-default].
+# Unset values in [policy-foobar] will be inherited from [policy-default]

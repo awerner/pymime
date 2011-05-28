@@ -22,13 +22,22 @@ import ast
 from pymime.utility import append_text
 
 class AttachmentPolicy(object):
-    def __init__(self, configsection):
-        self.policy = self._parse_policy(configsection["policy"])
-        self.action = self._parse_action(configsection["action"])
-        self.max_size = self._parse_max_size(configsection["max_size"])
-        self.mime = self._parse_list(configsection["mime"])
-        self.ext = self._parse_list(configsection["ext"])
-        self.store_function_options = self._parse_store_function_option(configsection["store-function-options"])
+    def __init__(self, configsection, fallback = None):
+        self.policy = self._call_with_fallback(self._parse_policy, configsection, "policy", fallback)
+        self.action = self._call_with_fallback(self._parse_action, configsection, "action", fallback)
+        self.max_size = self._call_with_fallback(self._parse_max_size, configsection, "max_size", fallback)
+        self.mime = self._call_with_fallback(self._parse_list, configsection, "mime", fallback)
+        self.ext = self._call_with_fallback(self._parse_list, configsection, "ext", fallback)
+        self.store_function_options = self._call_with_fallback(self._parse_store_function_option, configsection, "store-function-options", fallback)
+
+    def _call_with_fallback(self, func, dictionary, key, fallback = None):
+        try:
+            return func(dictionary[key])
+        except:
+            if fallback:
+                return func(fallback[key])
+            else:
+                raise
 
     def _parse_policy(self, value):
         value = value.lower()
@@ -124,7 +133,7 @@ class AttachmentService(PluginProvider):
 
     def build_policy_map(self):
         for option in self.config.map:
-            self.policy_map[option] = AttachmentPolicy(self.config["policy-" + self.config.map[option]])
+            self.policy_map[option] = AttachmentPolicy(self.config["policy-" + self.config.map[option]], self.config["policy-default"])
 
     def check_size(self, message, policy):
         if policy.check_size_allowed(message):
