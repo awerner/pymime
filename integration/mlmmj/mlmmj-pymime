@@ -1,6 +1,10 @@
 #!/bin/bash
 MLMMJRECIEVE=/usr/bin/mlmmj-recieve
-PYMIME=/var/spool/mlmmj/pymime.py
+VIRTUAL=/opt/pymime/virt
+PYMIME=$VIRTUAL/bin/pymimec
+
+. $VIRTUAL/bin/activate
+
 
 # check executables
 if ! [ -x $MLMMJRECIEVE ]; then
