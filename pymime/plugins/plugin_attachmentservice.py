@@ -90,7 +90,7 @@ class AttachmentPolicy(object):
     def check_ext_allowed(self, message):
         filename = message.get_filename()
         for ext in self.ext:
-            if filename.endswith(ext):
+            if filename.lower().endswith(ext):
                 return self.policy == "whitelist"
         else:
             return self.policy != "whitelist"
