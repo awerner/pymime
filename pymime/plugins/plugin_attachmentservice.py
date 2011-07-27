@@ -20,7 +20,7 @@ from email.generator import Generator
 from email.utils import parseaddr
 import os
 import ast
-from pymime.utility import append_text
+from pymime.utility import append_text, unicode_header
 
 class AttachmentPolicy(object):
     def __init__(self, configsection, fallback = None):
@@ -180,7 +180,10 @@ class AttachmentService(PluginProvider):
                         message.attach(part)
                     else:
                         attachments.append(part)
-                append_text(message, "\n--\n" + self.store_function(attachments, dict(message.items()), self.store_function_options, policy.store_function_options))
+                headers = dict()
+                for name, content in message.items():
+                    headers[name]=unicode_header(content)
+                append_text(message, "\n--\n" + self.store_function(attachments, headers, self.store_function_options, policy.store_function_options))
         return message
 
     def parse_part(self, message, policy):

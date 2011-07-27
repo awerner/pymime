@@ -14,6 +14,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import email.header
+
 def append_text(message, text):
     if message.is_multipart():
         for part in message.walk():
@@ -27,10 +29,10 @@ def append_text(message, text):
     else:
         cs = orig_cs
     try:
-        text = text.decode("utf-8").encode(cs)
+        text = text.encode(cs)
     except:
         cs = "utf-8"
-        text = text.decode("utf-8").encode(cs)
+        text = text
     payload = message.get_payload(decode = True).decode(orig_cs).encode(cs) + text
     try:
         del message["MIME-Version"]
@@ -41,3 +43,14 @@ def append_text(message, text):
     except:
         pass
     message.set_payload(payload, cs)
+
+def unicode_header(header):
+    parts = email.header.decode_header(header)
+    decoded_list=[]
+    for part in parts:
+        part_string, part_encoding = part
+        if part_encoding:
+            decoded_list.append(part_string.decode(part_encoding))
+        else:
+            decoded_list.append(part_string)
+    return u" ".join(decoded_list)

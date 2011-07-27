@@ -17,7 +17,7 @@
 from pymime.plugin import PluginProvider
 import pymime.plugins
 import os.path
-from pymime.utility import append_text
+from pymime.utility import append_text, unicode_header
 import email.utils
 from string import Template
 
@@ -60,9 +60,12 @@ class Footer(PluginProvider):
     def generate_identifiers(self, message):
         identifiers = {}
         for identifier, value in message.items():
-            identifiers[identifier] = value
+            identifiers[identifier] = unicode_header(value)
         for identifier, code in self.template_map.items():
-            headerlocal = [("header", dict(message.items())), ]
+            headers = dict()
+            for name, content in message.items():
+                headers[name]=unicode_header(content)
+            headerlocal = [("header", headers), ]
             try:
                 identifiers[identifier] = eval(code, {"__builtins__":None}, dict(allowedlocals.items() + headerlocal))
             except:
@@ -87,6 +90,6 @@ class Footer(PluginProvider):
             template = Template(footer)
             footer = template.safe_substitute(identifiers)
             if not footer.startswith("\n"):
-                footer = "\n" + footer
+                footer = u"\n" + footer
             append_text(message, footer)
         return message
