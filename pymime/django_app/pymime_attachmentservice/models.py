@@ -42,6 +42,7 @@ class Mail(models.Model):
 
 def _attachment_upload_to(instance, filename):
     instance.filename_orig = filename
+    filename=filename.encode("ascii","replace")
     if len(filename) > 100:
         ext = filename.rpartition(".")[2]
         if ext == filename:
