@@ -21,9 +21,11 @@ from email.utils import parseaddr
 import os
 import ast
 from pymime.utility import append_text, unicode_header
+import logging
 
 class AttachmentPolicy(object):
     def __init__(self, configsection, fallback = None):
+        self.logger = logging.getLogger("AttachmentPolicy({0})".format(configsection.section))
         self.policy = self._call_with_fallback(self._parse_policy, configsection, "policy", fallback)
         self.action = self._call_with_fallback(self._parse_action, configsection, "action", fallback)
         self.max_size = self._call_with_fallback(self._parse_max_size, configsection, "max_size", fallback)
@@ -83,17 +85,29 @@ class AttachmentPolicy(object):
         content_type = message.get_content_type()
         for mime in self.mime:
             if content_type.startswith(mime):
-                return self.policy == "whitelist"
-        else:
-            return self.policy != "whitelist"
+                status = (self.policy == "whitelist")
+                break
+            else:
+                status = (self.policy != "whitelist")
+        text = ""
+        if not status:
+            text = "NOT"
+        self.logger.info("MIME type of {0}({1}) is {2} allowed".format(message.get_filename(), content_type, text))
+        return status
 
     def check_ext_allowed(self, message):
         filename = message.get_filename()
         for ext in self.ext:
-            if filename.lower().endswith(ext):
-                return self.policy == "whitelist"
-        else:
-            return self.policy != "whitelist"
+            if filename.lower().endswith(ext.lower()):
+                status = (self.policy == "whitelist")
+                break
+            else:
+                status = (self.policy != "whitelist")
+        text = ""
+        if not status:
+            text = "NOT"
+        self.logger.info("Extension of {0} is {1} allowed".format(filename, text))
+        return status
 
     def check_size_allowed(self, message):
         fp = StringIO()
@@ -182,7 +196,7 @@ class AttachmentService(PluginProvider):
                         attachments.append(part)
                 headers = dict()
                 for name, content in message.items():
-                    headers[name]=unicode_header(content)
+                    headers[name] = unicode_header(content)
                 append_text(message, "\n--\n" + self.store_function(attachments, headers, self.store_function_options, policy.store_function_options))
         return message
 
