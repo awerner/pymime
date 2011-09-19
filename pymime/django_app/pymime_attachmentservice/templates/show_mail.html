@@ -26,6 +26,12 @@
 <p><strong>Content-type: </strong>{{attachment.content_type}}<br />
 <strong>File size: </strong>{{attachment.printsize}}</p>
 {% endfor %}
+<h3>Dropped attachments</h3>
+{% for attachment in mail.dropped_attachments.all %}
+<h4>{{attachment.filename}}</a></h4>
+<p><strong>Content-type: </strong>{{attachment.content_type}}<br />
+<strong>Reason: </strong>{{attachment.reason}}</p>
+{% endfor %}
 <div id="footer">
 <a href="{{ mail.get_admin_url }}">Admin</a>
 </div>

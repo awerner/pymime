@@ -18,14 +18,14 @@ import hashlib
 import os
 import sys
 
-def dummy_store(attachments, headers, options, policy_options):
+def dummy_store(attachments, dropped_attachments, headers, options, policy_options):
     """
     Simple store-function that returns a text with the number of attachments
     and does nothing with them, so they are lost.
     """
     return "Number of Attachments: {0}".format(len(attachments))
 
-def flat_store(attachments, headers, options, policy_options):
+def flat_store(attachments, dropped_attachments, headers, options, policy_options):
     """
     This store-function saves the detached attachments in the directory options["path"]
     (default: current working dir + store).
@@ -66,48 +66,69 @@ def flat_store(attachments, headers, options, policy_options):
         fp.close()
         fullurl = "{0}{1}/{2}".format(baseurl, hex, filename)
         footer += "\nAttachment: {0}".format(fullurl)
+    for dropped in dropped_attachments:
+        footer += "\nAttachment {0} was dropped".format(dropped.get_filename())
     footer += text_after
     return footer
 
-def django_store(attachments, headers, options, policy_options):
-    if options and not "project-path" in options and not "settings-module" in options:
-        raise AttributeError("Not properly configured.")
-    baseurl = "http://localhost/"
-    if "baseurl" in options:
-        baseurl = options["baseurl"]
-    if "project-path" in options:
-        sys.path.append(options["project-path"])
-    if "settings-module" in options:
-        modname, sep, setname = options["settings-module"].rpartition(".") #@UnusedVariable
-        mod = __import__(modname, fromlist = [setname])
-        settings = getattr(mod, setname)
-    else:
-        import settings #@UnresolvedImport
-    from django.core.management import setup_environ
-    setup_environ(settings)
-    from pymime.django_app.pymime_attachmentservice.models import Mail, Attachment
-    from django.core.files.base import ContentFile
-    m = Mail()
-    m.subject = headers["Subject"]
-    m.sender = headers["From"]
-    m.receiver = headers["To"]
-    if policy_options and "max-age" in policy_options:
-        m.max_age = int(policy_options["max-age"])
-    if "Archived-At" in headers:
-        m.archive_url = headers["Archived-At"].strip("<>")
-    m.save()
-    for part in attachments:
-        a = Attachment()
-        a.mail = m
-        a.content_type = part.get_content_type()
-        filename = part.get_filename()
-        if not filename:
-            ext = mimetypes.guess_extension(a.content_type)
-            if not ext:
-                ext = '.bin'
-            filename = "{0}{1}".format("attachment", ext)
-        a.filename_orig = filename
-        a.file.save(a.filename_orig, ContentFile(part.get_payload(decode = True)), save = True)
-        a.save()
-    url = "{0}{1}".format(baseurl.rstrip("/"), m.get_absolute_url())
-    return "Attachments are available at {0}".format(url)
+def django_store(attachments, dropped_attachments, headers, options, policy_options):
+    text_available = ""
+    if attachments:
+        if options and not "project-path" in options and not "settings-module" in options:
+            raise AttributeError("Not properly configured.")
+        baseurl = "http://localhost/"
+        if "baseurl" in options:
+            baseurl = options["baseurl"]
+        if "project-path" in options:
+            sys.path.append(options["project-path"])
+        if "settings-module" in options:
+            modname, sep, setname = options["settings-module"].rpartition(".") #@UnusedVariable
+            mod = __import__(modname, fromlist = [setname])
+            settings = getattr(mod, setname)
+        else:
+            import settings #@UnresolvedImport
+        from django.core.management import setup_environ
+        setup_environ(settings)
+        from pymime.django_app.pymime_attachmentservice.models import Mail, Attachment, Dropped_Attachment
+        from django.core.files.base import ContentFile
+        m = Mail()
+        m.subject = headers["Subject"]
+        m.sender = headers["From"]
+        m.receiver = headers["To"]
+        if policy_options and "max-age" in policy_options:
+            m.max_age = int(policy_options["max-age"])
+        if "Archived-At" in headers:
+            m.archive_url = headers["Archived-At"].strip("<>")
+        m.save()
+        for part in attachments:
+            a = Attachment()
+            a.mail = m
+            a.content_type = part.get_content_type()
+            filename = part.get_filename()
+            if not filename:
+                ext = mimetypes.guess_extension(a.content_type)
+                if not ext:
+                    ext = '.bin'
+                filename = "{0}{1}".format("attachment", ext)
+            a.filename_orig = filename
+            a.file.save(a.filename_orig, ContentFile(part.get_payload(decode = True)), save = True)
+            a.save()
+        for dropped in dropped_attachments:
+            d = Dropped_Attachment()
+            d.mail = m
+            d.content_type = dropped.get_content_type()
+            d.filename = dropped.get_filename()
+            d.save()
+        url = "{0}{1}".format(baseurl.rstrip("/"), m.get_absolute_url())
+        text_available = "These attachments are available at {0} :\n{1}".format(
+                                url,
+                                "\n".join([part.get_filename() for part in attachments]))
+    text_dropped = ""
+    if dropped_attachments:
+        text_dropped = "These attachments were dropped:\n{0}".format(
+                                "\n".join([dropped.get_filename() for dropped in dropped_attachments]))
+    text_conn = ""
+    if text_available != "" and text_dropped != "":
+        text_conn = "\n\n"
+    text = text_available + text_conn + text_dropped
+    return text

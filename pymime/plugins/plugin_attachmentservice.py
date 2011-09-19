@@ -25,7 +25,8 @@ import logging
 
 class AttachmentPolicy(object):
     def __init__(self, configsection, fallback = None):
-        self.logger = logging.getLogger("AttachmentPolicy({0})".format(configsection.section))
+        self.name = configsection.section
+        self.logger = logging.getLogger("AttachmentPolicy({0})".format(self.name))
         self.policy = self._call_with_fallback(self._parse_policy, configsection, "policy", fallback)
         self.action = self._call_with_fallback(self._parse_action, configsection, "action", fallback)
         self.max_size = self._call_with_fallback(self._parse_max_size, configsection, "max_size", fallback)
@@ -97,12 +98,15 @@ class AttachmentPolicy(object):
 
     def check_ext_allowed(self, message):
         filename = message.get_filename()
-        for ext in self.ext:
-            if filename.lower().endswith(ext.lower()):
-                status = (self.policy == "whitelist")
-                break
-            else:
-                status = (self.policy != "whitelist")
+        if filename:
+            for ext in self.ext:
+                if filename.lower().endswith(ext.lower()):
+                    status = (self.policy == "whitelist")
+                    break
+                else:
+                    status = (self.policy != "whitelist")
+        else:
+            status = False
         text = ""
         if not status:
             text = "NOT"
@@ -114,7 +118,11 @@ class AttachmentPolicy(object):
         g = Generator(fp)
         g.flatten(message)
         fp.seek(0, os.SEEK_END)
-        return fp.tell() <= self.max_size
+        fpsize = fp.tell()
+        status = (fpsize <= self.max_size)
+        if not status:
+            self.logger.info("Size of message is {0}, but only {1} is allowed.".format(fpsize, self.max_size))
+        return status
 
 class AttachmentService(PluginProvider):
     name = "AttachmentService"
@@ -136,7 +144,7 @@ class AttachmentService(PluginProvider):
             mod = __import__(modname, fromlist = [funcname])
             return getattr(mod, funcname)
         except:
-            self.logger.warning("store-function is invalid")
+            self.logger.exception("store-function is invalid")
             return False
 
     def _get_store_function_options(self):
@@ -154,37 +162,53 @@ class AttachmentService(PluginProvider):
         if policy.check_size_allowed(message):
             return True
         else:
+            self.logger.info("Dropping all attachments because mail is to large.")
             payload = []
+            dropped = []
             for part in message.get_payload():
                 if part.get_content_maintype() == "text":
                     payload.append(part)
+                else:
+                    dropped.append(part.get_filename())
             message.set_payload(None)
             for part in payload:
                 message.attach(part)
+            append_text(message, "\n--\nAttachments were dropped because the size of the mail was too large:\n" + "\n".join(dropped))
             return False
 
     def parse(self, message):
         policy = self.defaultpolicy
+        dropped_attachments = []
         if "To" in message:
             addr = parseaddr(message["To"])[1]
             if addr in self.policy_map:
                 policy = self.policy_map[addr]
+                self.logger.info("Policy for {0} found: {1}".format(addr, policy.name))
         if not policy:
+            self.logger.warning("No default policy! Returning Message unaltered.")
             return message
         if message.is_multipart():
             if not self.check_size(message, policy):
                 return message
             payload = []
             for part in message.walk():
+                dropped = None
                 ct = part.get_content_type()
+                if ct.startswith("multipart/"):
+                    continue
                 if not ct.startswith("text/"):
-                    part = self.parse_part(part, policy)
+                    part, dropped = self.parse_part(part, policy)
                 if part is not None:
                     payload.append(part)
+                if dropped is not None:
+                    dropped_attachments.append(dropped)
             if policy.action == "keep":
                 message.set_payload(None)
                 for part in payload:
                     message.attach(part)
+                if dropped_attachments:
+                    append_text(message, "\n--\nThese attachments were dropped because their MIME-type or extension is not allowed:\n" +
+                                "\n".join([dropped.get_filename() or "" for dropped in dropped_attachments]))
             elif policy.action == "store":
                 message.set_payload(None)
                 attachments = []
@@ -197,11 +221,11 @@ class AttachmentService(PluginProvider):
                 headers = dict()
                 for name, content in message.items():
                     headers[name] = unicode_header(content)
-                append_text(message, "\n--\n" + self.store_function(attachments, headers, self.store_function_options, policy.store_function_options))
+                append_text(message, "\n--\n" + self.store_function(attachments, dropped_attachments, headers, self.store_function_options, policy.store_function_options))
         return message
 
     def parse_part(self, message, policy):
         if not(policy.check_mime_allowed(message) and
                policy.check_ext_allowed(message)):
-            return None
-        return message
+            return None, message
+        return message, None

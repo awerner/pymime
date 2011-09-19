@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Mail, Attachment
+from models import Mail, Attachment, Dropped_Attachment
 from django.utils.translation import ugettext_lazy, ugettext as _
 
 admin.site.disable_action('delete_selected')
@@ -16,12 +16,16 @@ class AttachmentInline(admin.StackedInline):
     model = Attachment
     extra = 0
 
+class Dropped_AttachmentInline(admin.StackedInline):
+    model = Dropped_Attachment
+    extra = 0
+
 class MailAdmin(admin.ModelAdmin):
     list_display = ("subject", "sender", "receiver", "date")
     list_filter = ("receiver",)
     search_fields = ("subject", "sender", "receiver", "attachments__filename_orig", "attachments__content_type")
     date_hierarchy = "date"
-    inlines = (AttachmentInline,)
+    inlines = (AttachmentInline, Dropped_AttachmentInline)
 
 
 class AttachmentAdmin(admin.ModelAdmin):

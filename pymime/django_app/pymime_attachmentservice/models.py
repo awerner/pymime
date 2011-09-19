@@ -42,7 +42,7 @@ class Mail(models.Model):
 
 def _attachment_upload_to(instance, filename):
     instance.filename_orig = filename
-    filename=filename.encode("ascii","replace")
+    filename = filename.encode("ascii", "replace")
     if len(filename) > 100:
         ext = filename.rpartition(".")[2]
         if ext == filename:
@@ -92,3 +92,14 @@ class Attachment(models.Model):
     class Meta:
         verbose_name = "attachment"
         verbose_name_plural = "attachments"
+
+class Dropped_Attachment(models.Model):
+    mail = models.ForeignKey(Mail, related_name = "dropped_attachments")
+    content_type = models.CharField(max_length = 255, verbose_name = "content-type")
+    filename = models.CharField(max_length = 255, verbose_name = "filename")
+    reason = models.CharField(max_length = 255, verbose_name = "reason", blank = True, default = "Extension or Content-Type not allowed.")
+    def __unicode__(self):
+        return self.filename
+    class Meta:
+        verbose_name = "dropped attachment"
+        verbose_name_plural = "dropped attachments"
