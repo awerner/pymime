@@ -25,6 +25,7 @@ from multiprocessing import Event, Process, cpu_count
 from time import sleep
 import signal
 import atexit
+import sys
 
 
 
@@ -44,6 +45,7 @@ class ProcessManager(object):
         self.address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
         self.listener = Listener(self.address, authkey = mainconfig.daemon.authkey)
         self.maxage = int(mainconfig.daemon.max_process_age)
+        self.exit = False
         try:
             self.numprocess = cpu_count()
         except NotImplementedError:
@@ -51,18 +53,16 @@ class ProcessManager(object):
         self.processes = []
 
     def start(self):
+        signal.signal(signal.SIGHUP, self.reload)
         signal.signal(signal.SIGTERM, self.shutdown)
-        atexit.register(self.shutdown)
+        signal.signal(signal.SIGINT, self.shutdown)
         ROOT_LOGGER.info("Setting up {0} Worker processes".format(self.numprocess))
         self.populate_processes()
 
     def join(self):
-        try:
-            while True:
-                self.maintain_processes()
-                sleep(0.1)
-        except:
-            self.shutdown()
+        while not self.exit:
+            self.maintain_processes()
+            sleep(0.1)
 
     def join_exited_processes(self):
         cleaned = False
@@ -89,13 +89,18 @@ class ProcessManager(object):
         if self.join_exited_processes():
             self.populate_processes()
 
-    def shutdown(self):
+    def shutdown(self, signum = None, frame = None):
         ROOT_LOGGER.info("Initializing clean shutdown")
+        self.exit = True
         for p in self.processes:
             p.shutdown()
         ROOT_LOGGER.info("Stopping to listen")
         self.listener.close()
 
+    def reload(self, signum = None, frame = None):
+        ROOT_LOGGER.info("===== Reloading configuration =====")
+        for p in self.processes:
+            p.shutdown()
 
 class Worker(Process):
     """
