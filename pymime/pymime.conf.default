@@ -30,3 +30,8 @@ host=localhost
 
 # Password to authenticate the connection.
 authkey=###SECRETPASS###
+
+# Try to start the daemon if trying to connect to localhost and no daemon running.
+# pymimed must be in the $PATH in the Environment where pymimec is called.
+# Defaults to True
+start_daemon=True

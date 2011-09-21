@@ -19,6 +19,7 @@ import multiprocessing.connection
 from optparse import OptionParser
 from pymime.config import mainconfig
 import sys
+import subprocess
 
 parser = OptionParser()
 parser.add_option("-i", "--input", dest = "input", default = "-",
@@ -37,9 +38,18 @@ if options.output == "-":
 else:
     output = file(options.output, "w")
 
+if mainconfig.client.start_daemon:
+    try:
+        pf = file(mainconfig.daemon.pidfile, 'r')
+        pid = int(pf.read().strip())
+        pf.close()
+    except (IOError, ValueError):
+        pid = None
+    if not pid:
+        subprocess.Popen(["pymimed", "start"])
+
 address = (mainconfig.client.host, int(mainconfig.client.port))
 conn = multiprocessing.connection.Client(address, authkey = mainconfig.client.authkey)
-
 conn.send(input.read())
 input.close()
 output.write(conn.recv())
