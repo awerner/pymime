@@ -7,8 +7,8 @@ Installation & Configuration
 * Simply run `python setup.py install` to install the necessary files.
 * Look at the default configuration files in /etc/pymime/,
   copy them from *\*.conf.default* to *\*.conf* and change them to your liking.
-* Make sure that the server (`pymimed`) has write access to the logfile.
-* Run the server: `pymimed`.
+* Make sure that the server (`pymimed`) has write access to the logfile and the pidfile.
+* Run the server: `pymimed start[|stop|restart]`.
 * The client by default accepts mails from STDIN and writes them to STDOUT:
   `cat test.eml | pymimec > parsed.eml`
 

@@ -14,6 +14,9 @@ authkey=###SECRETPASS###
 # Logfile path. Must be writeable by the server. Defaults to /var/log/pymime.log
 logfile=/var/log/pymime.log
 
+# Pidfile path. Must be writeable by the server. Defaults to /var/run/pymime/pymimed.pid
+pidfile=/var/run/pymime/pymimed.pid
+
 # Maximum number of connections before the worker processes are respawned.
 max_process_age=1000
 

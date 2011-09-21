@@ -24,34 +24,35 @@ from multiprocessing.connection import Listener
 from multiprocessing import Event, Process, cpu_count
 from time import sleep
 import signal
-import sys
+import atexit
+
 
 
 logging.basicConfig(level = logging.DEBUG,
                     format = '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
                     filename = mainconfig.daemon.logfile)
 ROOT_LOGGER = logging.getLogger()
-ROOT_LOGGER.info(72 * "=")
-ROOT_LOGGER.info("Startup")
 
 
 class ProcessManager(object):
     """
     Runs the Worker processes that listen at the address.
     """
-    address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
-    listener = Listener(address, authkey = mainconfig.daemon.authkey)
-    maxage = int(mainconfig.daemon.max_process_age)
-    try:
-        numprocess = cpu_count()
-    except NotImplementedError:
-        numprocess = 1
-
     def __init__(self):
+        ROOT_LOGGER.info("="*72)
         ROOT_LOGGER.info("Listening on {0}:{1}".format(mainconfig.daemon.host, mainconfig.daemon.port))
+        self.address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
+        self.listener = Listener(self.address, authkey = mainconfig.daemon.authkey)
+        self.maxage = int(mainconfig.daemon.max_process_age)
+        try:
+            self.numprocess = cpu_count()
+        except NotImplementedError:
+            self.numprocess = 1
         self.processes = []
 
     def start(self):
+        signal.signal(signal.SIGTERM, self.shutdown)
+        atexit.register(self.shutdown)
         ROOT_LOGGER.info("Setting up {0} Worker processes".format(self.numprocess))
         self.populate_processes()
 
@@ -60,8 +61,7 @@ class ProcessManager(object):
             while True:
                 self.maintain_processes()
                 sleep(0.1)
-        except KeyboardInterrupt:
-            ROOT_LOGGER.info("Initializing clean shutdown")
+        except:
             self.shutdown()
 
     def join_exited_processes(self):
@@ -90,6 +90,7 @@ class ProcessManager(object):
             self.populate_processes()
 
     def shutdown(self):
+        ROOT_LOGGER.info("Initializing clean shutdown")
         for p in self.processes:
             p.shutdown()
         ROOT_LOGGER.info("Stopping to listen")
@@ -127,10 +128,12 @@ class Worker(Process):
             self.is_waiting.set()
             # Don't ignore the Interrupt signal
             signal.signal(signal.SIGINT, signal.SIG_DFL)
+            signal.signal(signal.SIGTERM, signal.SIG_DFL)
             self.logger.info("Waiting for job")
             self.conn = self.listener.accept()
             # Ignore the Interrupt signal unitl the connection is closed
             signal.signal(signal.SIGINT, signal.SIG_IGN)
+            signal.signal(signal.SIGTERM, signal.SIG_IGN)
             self.is_waiting.clear()
             self.logger.info("Receiving data")
             try:
@@ -165,9 +168,4 @@ class Worker(Process):
     def shutdown(self):
         self.logger.info("Shutting down worker")
         self.do_exit.set()
-
-
-if __name__ == "__main__":
-    p = ProcessManager()
-    p.start()
-    p.join()
+        self.terminate()
