@@ -12,3 +12,4 @@ integration/django_attachmentstore/sqlite.db
 distribute*.egg
 distribute*.tar.gz
 PyMIME.egg-info
+doc/_build/*

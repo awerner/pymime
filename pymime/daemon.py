@@ -27,7 +27,8 @@ import signal
 
 class ProcessManager(object):
     """
-    Runs the Worker processes that listen at the address.
+    This is the main object of pymimed. It runs and maintains the Worker processes.
+    It is also responsible for setting up the logging and the socket Listener.
     """
     def __init__(self):
         self.logger = None
@@ -44,6 +45,9 @@ class ProcessManager(object):
         self.processes = []
 
     def setup_logging(self):
+        """
+        Loads the logging configuration and sets up the root logger.
+        """
         logging.basicConfig(level = mainconfig.logging.level,
                     format = '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
                     filename = mainconfig.logging.file)
