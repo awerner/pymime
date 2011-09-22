@@ -70,7 +70,7 @@ class AttachmentPolicy(object):
         else:
             raise ValueError("Unrecognized file size: {0}".format(value))
 
-    def _parse_list(self, value):#
+    def _parse_list(self, value):
         value = value.split(",")
         value = map(lambda s: s.strip(), value)
         return value
@@ -93,7 +93,7 @@ class AttachmentPolicy(object):
         text = ""
         if not status:
             text = "NOT"
-        self.logger.info("MIME type of {0}({1}) is {2} allowed".format(message.get_filename(), content_type, text))
+        self.logger.info(u"MIME type of {0}({1}) is {2} allowed".format(message.get_filename(), content_type, text))
         return status
 
     def check_ext_allowed(self, message):
@@ -110,7 +110,7 @@ class AttachmentPolicy(object):
         text = ""
         if not status:
             text = "NOT"
-        self.logger.info("Extension of {0} is {1} allowed".format(filename, text))
+        self.logger.info(u"Extension of {0} is {1} allowed".format(filename, text))
         return status
 
     def check_size_allowed(self, message):
@@ -173,7 +173,7 @@ class AttachmentService(PluginProvider):
             message.set_payload(None)
             for part in payload:
                 message.attach(part)
-            append_text(message, "\n--\nAttachments were dropped because the size of the mail was too large:\n" + "\n".join(dropped))
+            append_text(message, u"\n--\nAttachments were dropped because the size of the mail was too large:\n" + "\n".join(dropped))
             return False
 
     def parse(self, message):

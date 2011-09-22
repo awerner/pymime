@@ -67,7 +67,7 @@ def flat_store(attachments, dropped_attachments, headers, options, policy_option
         fullurl = "{0}{1}/{2}".format(baseurl, hex, filename)
         footer += "\nAttachment: {0}".format(fullurl)
     for dropped in dropped_attachments:
-        footer += "\nAttachment {0} was dropped".format(dropped.get_filename())
+        footer += u"\nAttachment {0} was dropped".format(dropped.get_filename())
     footer += text_after
     return footer
 
@@ -120,13 +120,13 @@ def django_store(attachments, dropped_attachments, headers, options, policy_opti
             d.filename = dropped.get_filename()
             d.save()
         url = "{0}{1}".format(baseurl.rstrip("/"), m.get_absolute_url())
-        text_available = "These attachments are available at {0} :\n{1}".format(
+        text_available = u"These attachments are available at {0} :\n{1}".format(
                                 url,
-                                "\n".join([part.get_filename() for part in attachments]))
+                                u"\n".join([part.get_filename() for part in attachments]))
     text_dropped = ""
     if dropped_attachments:
-        text_dropped = "These attachments were dropped:\n{0}".format(
-                                "\n".join([dropped.get_filename() for dropped in dropped_attachments]))
+        text_dropped = u"These attachments were dropped:\n{0}".format(
+                                u"\n".join([dropped.get_filename() for dropped in dropped_attachments]))
     text_conn = ""
     if text_available != "" and text_dropped != "":
         text_conn = "\n\n"
