@@ -22,55 +22,76 @@ import sys
 import subprocess
 import logging
 
-parser = OptionParser()
-parser.add_option("-i", "--input", dest = "input", default = "-",
-                   help = "Where to read the mail from. Defaults to STDIN")
-parser.add_option("-o", "--output", dest = "output", default = "-",
-                   help = "Where to write the transformed mail. Defaults to STDOUT")
-options, args = parser.parse_args()
 
-if options.input == "-":
-    input = sys.stdin
-else:
-    input = file(options.input)
+class Client(object):
+    def __init__(self):
+        self.logger = None
+        self.setup_logging()
+        self.input = None
+        self.output = None
+        self.parse_opts()
 
-if options.output == "-":
-    output = sys.stdout
-else:
-    output = file(options.output, "w")
+    def run(self):
+        self.start_daemon()
+        self.send()
 
-ROOT_LOGGER = logging.getLogger()
-ROOT_LOGGER.addHandler(logging.NullHandler())
-if mainconfig.logging.maildest:
-    from logging.handlers import SMTPHandler
-    host = mainconfig.logging.smtp
-    if mainconfig.logging.smtpport:
-        host = (host, mainconfig.logging.smtpport)
-        mailhandler = SMTPHandler(host,
-                      mainconfig.logging.mailfrom,
-                      mainconfig.logging.maildest.split(","),
-                      mainconfig.logging.mailsubject)
-        mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
-        ROOT_LOGGER.setLevel(mainconfig.logging.maillevel)
-        ROOT_LOGGER.addHandler(mailhandler)
-try:
-    if mainconfig.client.start_daemon:
+    def parse_opts(self):
+        parser = OptionParser()
+        parser.add_option("-i", "--input", dest = "input", default = "-",
+                           help = "Where to read the mail from. Defaults to STDIN")
+        parser.add_option("-o", "--output", dest = "output", default = "-",
+                           help = "Where to write the transformed mail. Defaults to STDOUT")
+        options, args = parser.parse_args()
+
+        if options.input == "-":
+            self.input = sys.stdin
+        else:
+            self.input = file(options.input)
+
+        if options.output == "-":
+            self.output = sys.stdout
+        else:
+            self.output = file(options.output, "w")
+
+    def setup_logging(self):
+        self.logger = logging.getLogger()
+        self.logger.addHandler(logging.NullHandler())
+        if mainconfig.logging.maildest:
+            from logging.handlers import SMTPHandler
+            host = mainconfig.logging.smtp
+            if mainconfig.logging.smtpport:
+                host = (host, mainconfig.logging.smtpport)
+                mailhandler = SMTPHandler(host,
+                              mainconfig.logging.mailfrom,
+                              mainconfig.logging.maildest.split(","),
+                              mainconfig.logging.mailsubject)
+                mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
+                self.logger.setLevel(mainconfig.logging.maillevel)
+                self.logger.addHandler(mailhandler)
+
+    def start_daemon(self):
         try:
-            pf = file(mainconfig.daemon.pidfile, 'r')
-            pid = int(pf.read().strip())
-            pf.close()
-        except (IOError, ValueError):
-            pid = None
-        if not pid:
-            subprocess.Popen(["pymimed", "start"])
-            ROOT_LOGGER.warning("Pymimed seems not to be running. Trying to start it.")
+            if mainconfig.client.start_daemon:
+                try:
+                    pf = file(mainconfig.daemon.pidfile, 'r')
+                    pid = int(pf.read().strip())
+                    pf.close()
+                except (IOError, ValueError):
+                    pid = None
+                if not pid:
+                    subprocess.Popen(["pymimed", "start"])
+                    self.logger.warning("Pymimed seems not to be running. Trying to start it.")
+        except:
+            self.logger.exception("Exception occured while trying to start pymimed from pymimec.")
 
-    address = (mainconfig.client.host, int(mainconfig.client.port))
-    conn = multiprocessing.connection.Client(address, authkey = mainconfig.client.authkey)
-    conn.send(input.read())
-    input.close()
-    output.write(conn.recv())
-    conn.close()
-    output.close()
-except:
-    ROOT_LOGGER.exception("Exception occured in pymimec")
+    def send(self):
+        try:
+            address = (mainconfig.client.host, int(mainconfig.client.port))
+            conn = multiprocessing.connection.Client(address, authkey = mainconfig.client.authkey)
+            conn.send(self.input.read())
+            self.input.close()
+            self.output.write(conn.recv())
+            conn.close()
+            self.output.close()
+        except:
+            self.logger.exception("Exception occured in pymimec")
