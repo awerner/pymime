@@ -33,6 +33,7 @@ class ProcessManager(object):
     def __init__(self):
         self.logger = None
         self.setup_logging()
+        self.logger.warning("Starting PyMIME")
         self.logger.info("Listening on {0}:{1}".format(mainconfig.daemon.host, mainconfig.daemon.port))
         self.address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
         self.listener = Listener(self.address, authkey = mainconfig.daemon.authkey)
@@ -48,7 +49,7 @@ class ProcessManager(object):
         """
         Loads the logging configuration and sets up the root logger.
         """
-        logging.basicConfig(level = mainconfig.logging.level,
+        logging.basicConfig(level = getattr(logging, mainconfig.logging.level.upper()),
                     format = '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
                     filename = mainconfig.logging.file)
         self.logger = logging.getLogger()
@@ -59,13 +60,13 @@ class ProcessManager(object):
                 host = mainconfig.logging.smtp
                 if mainconfig.logging.smtpport:
                     host = (host, mainconfig.logging.smtpport)
-                    mailhandler = SMTPHandler(host,
-                                  mainconfig.logging.mailfrom,
-                                  mainconfig.logging.maildest.split(","),
-                                  mainconfig.logging.mailsubject)
-                    mailhandler.setLevel(mainconfig.logging.maillevel)
-                    mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
-                    self.logger.addHandler(mailhandler)
+                mailhandler = SMTPHandler(host,
+                              mainconfig.logging.mailfrom,
+                              mainconfig.logging.maildest.split(","),
+                              mainconfig.logging.mailsubject)
+                mailhandler.setLevel(getattr(logging,mainconfig.logging.maillevel.upper()))
+                mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
+                self.logger.addHandler(mailhandler)
         except:
             self.logger.exception("Exception while trying to configure maillogging.")
 
@@ -107,7 +108,7 @@ class ProcessManager(object):
             self.populate_processes()
 
     def shutdown(self, signum = None, frame = None):
-        self.logger.info("Initializing clean shutdown")
+        self.logger.warning("Initializing clean shutdown")
         self.exit = True
         for p in self.processes:
             p.shutdown()

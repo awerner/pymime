@@ -21,7 +21,7 @@ from pymime.config import mainconfig
 import sys
 import subprocess
 import logging
-
+from os import devnull
 
 class Client(object):
     def __init__(self):
@@ -55,19 +55,19 @@ class Client(object):
 
     def setup_logging(self):
         self.logger = logging.getLogger()
-        self.logger.addHandler(logging.NullHandler())
+        self.logger.addHandler(logging.FileHandler(devnull))
         if mainconfig.logging.maildest:
             from logging.handlers import SMTPHandler
             host = mainconfig.logging.smtp
             if mainconfig.logging.smtpport:
                 host = (host, mainconfig.logging.smtpport)
-                mailhandler = SMTPHandler(host,
+            mailhandler = SMTPHandler(host,
                               mainconfig.logging.mailfrom,
                               mainconfig.logging.maildest.split(","),
                               mainconfig.logging.mailsubject)
-                mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
-                self.logger.setLevel(mainconfig.logging.maillevel)
-                self.logger.addHandler(mailhandler)
+            mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
+            self.logger.setLevel(getattr(logging,mainconfig.logging.maillevel.upper()))
+            self.logger.addHandler(mailhandler)
 
     def start_daemon(self):
         try:
