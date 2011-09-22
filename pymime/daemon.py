@@ -17,22 +17,12 @@
 
 import email
 import logging
-import pymime.globals
 from pymime.config import mainconfig
 import pymime.plugin
 from multiprocessing.connection import Listener
 from multiprocessing import Event, Process, cpu_count
 from time import sleep
 import signal
-import atexit
-import sys
-
-
-
-logging.basicConfig(level = logging.DEBUG,
-                    format = '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
-                    filename = mainconfig.daemon.logfile)
-ROOT_LOGGER = logging.getLogger()
 
 
 class ProcessManager(object):
@@ -40,8 +30,9 @@ class ProcessManager(object):
     Runs the Worker processes that listen at the address.
     """
     def __init__(self):
-        ROOT_LOGGER.info("="*72)
-        ROOT_LOGGER.info("Listening on {0}:{1}".format(mainconfig.daemon.host, mainconfig.daemon.port))
+        self.logger = None
+        self.setup_logging()
+        self.logger.info("Listening on {0}:{1}".format(mainconfig.daemon.host, mainconfig.daemon.port))
         self.address = (mainconfig.daemon.host, int(mainconfig.daemon.port))
         self.listener = Listener(self.address, authkey = mainconfig.daemon.authkey)
         self.maxage = int(mainconfig.daemon.max_process_age)
@@ -52,11 +43,33 @@ class ProcessManager(object):
             self.numprocess = 1
         self.processes = []
 
+    def setup_logging(self):
+        logging.basicConfig(level = mainconfig.logging.level,
+                    format = '%(asctime)s %(levelname)-8s %(name)-12s %(message)s',
+                    filename = mainconfig.logging.file)
+        self.logger = logging.getLogger()
+        self.logger.info("="*72)
+        try:
+            if mainconfig.logging.maildest:
+                from logging.handlers import SMTPHandler
+                host = mainconfig.logging.smtp
+                if mainconfig.logging.smtpport:
+                    host = (host, mainconfig.logging.smtpport)
+                    mailhandler = SMTPHandler(host,
+                                  mainconfig.logging.mailfrom,
+                                  mainconfig.logging.maildest.split(","),
+                                  mainconfig.logging.mailsubject)
+                    mailhandler.setLevel(mainconfig.logging.maillevel)
+                    mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
+                    self.logger.addHandler(mailhandler)
+        except:
+            self.logger.exception("Exception while trying to configure maillogging.")
+
     def start(self):
         signal.signal(signal.SIGHUP, self.reload)
         signal.signal(signal.SIGTERM, self.shutdown)
         signal.signal(signal.SIGINT, self.shutdown)
-        ROOT_LOGGER.info("Setting up {0} Worker processes".format(self.numprocess))
+        self.logger.info("Setting up {0} Worker processes".format(self.numprocess))
         self.populate_processes()
 
     def join(self):
@@ -71,8 +84,8 @@ class ProcessManager(object):
             if process.exitcode is not None:
                 process.join()
                 if process.exitcode > 0:
-                    ROOT_LOGGER.critical("Worker process aborted with exitcode {0}".format(process.exitcode))
-                    ROOT_LOGGER.critical("If no other error was logged, this may be caused by an exception when loading the plugins.")
+                    self.logger.critical("Worker process aborted with exitcode {0}".format(process.exitcode))
+                    self.logger.critical("If no other error was logged, this may be caused by an exception when loading the plugins.")
                     exit(1)
                 cleaned = True
                 del self.processes[i]
@@ -90,15 +103,15 @@ class ProcessManager(object):
             self.populate_processes()
 
     def shutdown(self, signum = None, frame = None):
-        ROOT_LOGGER.info("Initializing clean shutdown")
+        self.logger.info("Initializing clean shutdown")
         self.exit = True
         for p in self.processes:
             p.shutdown()
-        ROOT_LOGGER.info("Stopping to listen")
+        self.logger.info("Stopping to listen")
         self.listener.close()
 
     def reload(self, signum = None, frame = None):
-        ROOT_LOGGER.info("===== Reloading configuration =====")
+        self.logger.info("===== Reloading configuration =====")
         for p in self.processes:
             p.shutdown()
 
@@ -126,7 +139,7 @@ class Worker(Process):
         except:
             #Logging doesn't work here
             exit(1)
-        self.plugins = pymime.plugin.PluginProvider.get_plugins()
+        self.plugins = pymime.plugin.PluginProvider.get_plugins() #@UndefinedVariable
         self.logger.info("Loaded Plugins: {0}".format(", ".join([plugin.name for plugin in self.plugins])))
         error = False
         while not self.do_exit.is_set() and (self.maxage is None or self.completed < self.maxage):

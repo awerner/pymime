@@ -190,7 +190,7 @@ def writable_or_exit(f):
         os.remove(f)
 
 if __name__ == "__main__":
-    writable_or_exit(mainconfig.daemon.logfile)
+    writable_or_exit(mainconfig.logging.file)
     writable_or_exit(mainconfig.daemon.pidfile)
     daemon = PymimeDaemon(mainconfig.daemon.pidfile)
     if len(sys.argv) == 2:

@@ -11,9 +11,6 @@ host=localhost
 # The password is only used for authentication, not encryption.
 authkey=###SECRETPASS###
 
-# Logfile path. Must be writeable by the server. Defaults to /var/log/pymime.log
-logfile=/var/log/pymime.log
-
 # Pidfile path. Must be writeable by the server. Defaults to /var/run/pymime/pymimed.pid
 pidfile=/var/run/pymime/pymimed.pid
 
@@ -35,3 +32,29 @@ authkey=###SECRETPASS###
 # pymimed must be in the $PATH in the Environment where pymimec is called.
 # Defaults to True
 start_daemon=True
+
+
+[logging]
+# Logfile path. Must be writeable by the server. Defaults to /var/log/pymime.log
+file=/var/log/pymime.log
+
+# Loglevel can be one of DEBUG|INFO|WARNING|ERROR|CRITICAL. Defaults to INFO.
+level=INFO
+
+# Send mails with logged events to the following addresses.
+# Multiple entries are comma-separated without whitespace.
+# To disable set to empty value. Defaults to root.
+maildest=root
+
+# From address for sent logmails. Defaults to root.
+mailfrom=root
+
+# Subject of the logmails. Defaults to "PyMIME Error notification".
+mailsubject=PyMIME Error notification
+
+# Threshold loglevel for mailing events. Defaults to WARNING.
+maillevel=WARNING
+
+# SMTP Server to use for sending the mails. Defaults to localhost, port empty for default (25).
+smtp=localhost
+smtpport=

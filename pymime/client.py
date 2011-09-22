@@ -20,6 +20,7 @@ from optparse import OptionParser
 from pymime.config import mainconfig
 import sys
 import subprocess
+import logging
 
 parser = OptionParser()
 parser.add_option("-i", "--input", dest = "input", default = "-",
@@ -38,20 +39,38 @@ if options.output == "-":
 else:
     output = file(options.output, "w")
 
-if mainconfig.client.start_daemon:
-    try:
-        pf = file(mainconfig.daemon.pidfile, 'r')
-        pid = int(pf.read().strip())
-        pf.close()
-    except (IOError, ValueError):
-        pid = None
-    if not pid:
-        subprocess.Popen(["pymimed", "start"])
+ROOT_LOGGER = logging.getLogger()
+ROOT_LOGGER.addHandler(logging.NullHandler())
+if mainconfig.logging.maildest:
+    from logging.handlers import SMTPHandler
+    host = mainconfig.logging.smtp
+    if mainconfig.logging.smtpport:
+        host = (host, mainconfig.logging.smtpport)
+        mailhandler = SMTPHandler(host,
+                      mainconfig.logging.mailfrom,
+                      mainconfig.logging.maildest.split(","),
+                      mainconfig.logging.mailsubject)
+        mailhandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(name)-12s %(message)s'))
+        ROOT_LOGGER.setLevel(mainconfig.logging.maillevel)
+        ROOT_LOGGER.addHandler(mailhandler)
+try:
+    if mainconfig.client.start_daemon:
+        try:
+            pf = file(mainconfig.daemon.pidfile, 'r')
+            pid = int(pf.read().strip())
+            pf.close()
+        except (IOError, ValueError):
+            pid = None
+        if not pid:
+            subprocess.Popen(["pymimed", "start"])
+            ROOT_LOGGER.warning("Pymimed seems not to be running. Trying to start it.")
 
-address = (mainconfig.client.host, int(mainconfig.client.port))
-conn = multiprocessing.connection.Client(address, authkey = mainconfig.client.authkey)
-conn.send(input.read())
-input.close()
-output.write(conn.recv())
-conn.close()
-output.close()
+    address = (mainconfig.client.host, int(mainconfig.client.port))
+    conn = multiprocessing.connection.Client(address, authkey = mainconfig.client.authkey)
+    conn.send(input.read())
+    input.close()
+    output.write(conn.recv())
+    conn.close()
+    output.close()
+except:
+    ROOT_LOGGER.exception("Exception occured in pymimec")
