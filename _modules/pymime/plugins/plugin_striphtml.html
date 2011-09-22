@@ -1,0 +1,269 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pymime.plugins.plugin_striphtml &mdash; PyMIME v0.2 documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="PyMIME v0.2 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">PyMIME v0.2 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pymime.plugins.plugin_striphtml</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="c">#    Copyright 2011 Alexander Werner</span>
+<span class="c">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c">#    (at your option) any later version.</span>
+<span class="c">#</span>
+<span class="c">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c">#    GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c">#    You should have received a copy of the GNU General Public License</span>
+<span class="c">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">HTMLParser</span>
+<span class="kn">from</span> <span class="nn">pymime.plugin</span> <span class="kn">import</span> <span class="n">PluginProvider</span>
+
+<span class="c">#-------------------------------------------------------------------------------</span>
+<span class="c"># Configuration Options start here</span>
+
+<span class="n">IGNORETAGS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;script&quot;</span><span class="p">,</span> <span class="s">&quot;head&quot;</span><span class="p">,</span> <span class="s">&quot;title&quot;</span><span class="p">,</span> <span class="s">&quot;link&quot;</span><span class="p">)</span>
+<span class="n">MAP_STARTTAGS</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;li&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">* &quot;</span><span class="p">,</span>
+                 <span class="s">&quot;p&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">}</span>
+<span class="n">MAP_ENDTAGS</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;p&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;div&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;h1&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">==============================================================</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;h2&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">--------------------------------------------------------------</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;h3&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;h4&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;h5&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+               <span class="s">&quot;h6&quot;</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">}</span>
+<span class="n">MAXNUMNEWLINES</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c"># No Configuration beneath this line</span>
+<span class="c"># -------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="StripHTMLParser"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTMLParser">[docs]</a><span class="k">class</span> <span class="nc">StripHTMLParser</span><span class="p">(</span><span class="n">HTMLParser</span><span class="o">.</span><span class="n">HTMLParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class provides the necessary logic to convert HTML to plain text.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_starttag</span> <span class="o">=</span> <span class="bp">None</span>
+<div class="viewcode-block" id="StripHTMLParser.handle_starttag"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTMLParser.handle_starttag">[docs]</a>    <span class="k">def</span> <span class="nf">handle_starttag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_starttag</span> <span class="o">=</span> <span class="n">tag</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">MAP_STARTTAGS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MAP_STARTTAGS</span><span class="p">[</span><span class="n">tag</span><span class="p">])</span></div>
+<div class="viewcode-block" id="StripHTMLParser.handle_endtag"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTMLParser.handle_endtag">[docs]</a>    <span class="k">def</span> <span class="nf">handle_endtag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">MAP_ENDTAGS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MAP_ENDTAGS</span><span class="p">[</span><span class="n">tag</span><span class="p">])</span></div>
+<div class="viewcode-block" id="StripHTMLParser.handle_data"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTMLParser.handle_data">[docs]</a>    <span class="k">def</span> <span class="nf">handle_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_starttag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">IGNORETAGS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+<div class="viewcode-block" id="StripHTMLParser.remove_whitespace"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTMLParser.remove_whitespace">[docs]</a>    <span class="k">def</span> <span class="nf">remove_whitespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Split at newlines instead of tags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plain</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">numspace</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># Copy the whole text</span>
+        <span class="n">oldplain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">oldplain</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">or</span> <span class="n">line</span> <span class="ow">is</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">numspace</span> <span class="o">=</span> <span class="n">numspace</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">numspace</span> <span class="o">&lt;=</span> <span class="n">MAXNUMNEWLINES</span><span class="p">:</span>
+                    <span class="c"># number of blank newlines is lower than limit, append line</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">numspace</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c"># line is no blank newline, append line</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+<div class="viewcode-block" id="StripHTMLParser.get_plain_data"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTMLParser.get_plain_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plain_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_whitespace</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plain</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="StripHTML"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTML">[docs]</a><span class="k">class</span> <span class="nc">StripHTML</span><span class="p">(</span><span class="n">PluginProvider</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;StripHTML&quot;</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">hasconfig</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StripHTML</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="StripHTML.parse"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTML.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">is_multipart</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_multipart</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_singlepart</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
+</div>
+<div class="viewcode-block" id="StripHTML.parse_singlepart"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTML.parse_singlepart">[docs]</a>    <span class="k">def</span> <span class="nf">parse_singlepart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses a singlepart message object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">message</span><span class="p">:</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s">&quot;text/html&quot;</span><span class="p">:</span>
+            <span class="c"># text/html must be stripped down to text/plain</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">StripHTML</span><span class="p">()</span>
+            <span class="c"># Feed the HTML-Stripper with the body of the message</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">get_payload</span><span class="p">())</span>
+            <span class="c"># And set the body of the message to the output of the HTML-Stripper </span>
+            <span class="n">message</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">get_plain_data</span><span class="p">())</span>
+            <span class="c"># rewrite the Content-Type header, im no longer an evil HTML mail :)</span>
+            <span class="n">message</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="s">&quot;text/plain&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">param</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">message</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+</div>
+<div class="viewcode-block" id="StripHTML.parse_multipart"><a class="viewcode-back" href="../../../included_plugins.html#pymime.plugins.plugin_striphtml.StripHTML.parse_multipart">[docs]</a>    <span class="k">def</span> <span class="nf">parse_multipart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses a multipart message object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mails</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#---------------------------------------------------------------------------</span>
+        <span class="c"># Test if the message has a text/plain and a text/html part</span>
+        <span class="n">has_plaintext</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">has_html</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s">&quot;text/plain&quot;</span><span class="p">:</span>
+                <span class="n">has_plaintext</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s">&quot;text/html&quot;</span><span class="p">:</span>
+                <span class="n">has_html</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c">#---------------------------------------------------------------------------</span>
+        <span class="c"># If the message has both text/plain and text/html parts, dismiss the text/html part.</span>
+        <span class="k">if</span> <span class="n">has_plaintext</span> <span class="ow">and</span> <span class="n">has_html</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+                <span class="n">content_type</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">content_type</span> <span class="o">!=</span> <span class="s">&quot;text/html&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">part</span><span class="o">.</span><span class="n">is_multipart</span><span class="p">():</span>
+                        <span class="n">mails</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">has_plaintext</span> <span class="ow">and</span> <span class="n">has_html</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+                <span class="n">content_type</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">content_type</span> <span class="o">==</span> <span class="s">&quot;text/plain&quot;</span><span class="p">:</span>
+                    <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_singlepart</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">part</span><span class="o">.</span><span class="n">is_multipart</span><span class="p">():</span>
+                    <span class="n">mails</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">part</span><span class="o">.</span><span class="n">is_multipart</span><span class="p">():</span>
+                    <span class="n">mails</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+        <span class="c">#---------------------------------------------------------------------------</span>
+        <span class="c"># Test if at least one submessage survived the parsing</span>
+        <span class="k">if</span> <span class="n">mails</span><span class="p">:</span>
+            <span class="c"># Delete the body from the message</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+            <span class="c"># Only one submessage to be included in the body, a restructuring of the parent</span>
+            <span class="c"># message is necessary.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mails</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">mail</span> <span class="o">=</span> <span class="n">mails</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c"># Copy the Headers from the submessage to the parent message</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mail</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mail</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="c"># If the parent message is still multipart, the submessage didn&#39;t have a Content-Type</span>
+                <span class="c"># Header. Replace the old parent Content-Type with a default.</span>
+                <span class="k">if</span> <span class="s">&quot;multipart&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">get_content_maintype</span><span class="p">():</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="s">&quot;Content-Type&quot;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="s">&quot;Content-Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;text/plain&quot;</span>
+                <span class="c"># Copy the body from the submessage to teh parent message</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="n">mails</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_payload</span><span class="p">())</span>
+            <span class="c"># Multiple submessages are to be included, simply attach them.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">mail</span> <span class="ow">in</span> <span class="n">mails</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">mail</span><span class="p">)</span>
+        <span class="c"># No Message is to be included</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">PyMIME v0.2 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Alexander Werner.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

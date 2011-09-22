@@ -1,0 +1,272 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Included Plugins &mdash; PyMIME v0.2 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyMIME v0.2 documentation" href="index.html" />
+    <link rel="prev" title="PyMIME’s API" href="api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="PyMIME’s API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyMIME v0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="included-plugins">
+<h1>Included Plugins<a class="headerlink" href="#included-plugins" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pymime.plugins.plugin_archiveheader">
+<span id="archiveheader"></span><h2>Archiveheader<a class="headerlink" href="#module-pymime.plugins.plugin_archiveheader" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.plugins.plugin_archiveheader.ArchiveHeader">
+<em class="property">class </em><tt class="descclassname">pymime.plugins.plugin_archiveheader.</tt><tt class="descname">ArchiveHeader</tt><a class="reference internal" href="_modules/pymime/plugins/plugin_archiveheader.html#ArchiveHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_archiveheader.ArchiveHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="api.html#pymime.plugin.PluginProvider" title="pymime.plugin.PluginProvider"><tt class="xref py py-class docutils literal"><span class="pre">pymime.plugin.PluginProvider</span></tt></a></p>
+<dl class="method">
+<dt id="pymime.plugins.plugin_archiveheader.ArchiveHeader.parse">
+<tt class="descname">parse</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_archiveheader.html#ArchiveHeader.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_archiveheader.ArchiveHeader.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add mail-archive.com direct-link to archive <a class="reference external" href="http://www.mail-archive.com/faq.html#listserver">http://www.mail-archive.com/faq.html#listserver</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.plugins.plugin_attachmentservice">
+<span id="attachmentservice"></span><h2>Attachmentservice<a class="headerlink" href="#module-pymime.plugins.plugin_attachmentservice" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentPolicy">
+<em class="property">class </em><tt class="descclassname">pymime.plugins.plugin_attachmentservice.</tt><tt class="descname">AttachmentPolicy</tt><big>(</big><em>configsection</em>, <em>fallback=None</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentPolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentPolicy.check_ext_allowed">
+<tt class="descname">check_ext_allowed</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentPolicy.check_ext_allowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentPolicy.check_ext_allowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentPolicy.check_mime_allowed">
+<tt class="descname">check_mime_allowed</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentPolicy.check_mime_allowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentPolicy.check_mime_allowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentPolicy.check_size_allowed">
+<tt class="descname">check_size_allowed</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentPolicy.check_size_allowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentPolicy.check_size_allowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentService">
+<em class="property">class </em><tt class="descclassname">pymime.plugins.plugin_attachmentservice.</tt><tt class="descname">AttachmentService</tt><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="api.html#pymime.plugin.PluginProvider" title="pymime.plugin.PluginProvider"><tt class="xref py py-class docutils literal"><span class="pre">pymime.plugin.PluginProvider</span></tt></a></p>
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentService.build_policy_map">
+<tt class="descname">build_policy_map</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentService.build_policy_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentService.build_policy_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentService.check_size">
+<tt class="descname">check_size</tt><big>(</big><em>message</em>, <em>policy</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentService.check_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentService.check_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentService.parse">
+<tt class="descname">parse</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentService.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentService.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_attachmentservice.AttachmentService.parse_part">
+<tt class="descname">parse_part</tt><big>(</big><em>message</em>, <em>policy</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_attachmentservice.html#AttachmentService.parse_part"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_attachmentservice.AttachmentService.parse_part" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.plugins.plugin_footer">
+<span id="footer"></span><h2>Footer<a class="headerlink" href="#module-pymime.plugins.plugin_footer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.plugins.plugin_footer.Footer">
+<em class="property">class </em><tt class="descclassname">pymime.plugins.plugin_footer.</tt><tt class="descname">Footer</tt><a class="reference internal" href="_modules/pymime/plugins/plugin_footer.html#Footer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_footer.Footer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="api.html#pymime.plugin.PluginProvider" title="pymime.plugin.PluginProvider"><tt class="xref py py-class docutils literal"><span class="pre">pymime.plugin.PluginProvider</span></tt></a></p>
+<dl class="method">
+<dt id="pymime.plugins.plugin_footer.Footer.build_footer_map">
+<tt class="descname">build_footer_map</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_footer.html#Footer.build_footer_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_footer.Footer.build_footer_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_footer.Footer.build_template_map">
+<tt class="descname">build_template_map</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_footer.html#Footer.build_template_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_footer.Footer.build_template_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_footer.Footer.generate_identifiers">
+<tt class="descname">generate_identifiers</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_footer.html#Footer.generate_identifiers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_footer.Footer.generate_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_footer.Footer.parse">
+<tt class="descname">parse</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_footer.html#Footer.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_footer.Footer.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_footer.Footer.parse_path">
+<tt class="descname">parse_path</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_footer.html#Footer.parse_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_footer.Footer.parse_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.plugins.plugin_striphtml">
+<span id="striphtml"></span><h2>Striphtml<a class="headerlink" href="#module-pymime.plugins.plugin_striphtml" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.plugins.plugin_striphtml.StripHTML">
+<em class="property">class </em><tt class="descclassname">pymime.plugins.plugin_striphtml.</tt><tt class="descname">StripHTML</tt><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="api.html#pymime.plugin.PluginProvider" title="pymime.plugin.PluginProvider"><tt class="xref py py-class docutils literal"><span class="pre">pymime.plugin.PluginProvider</span></tt></a></p>
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTML.parse">
+<tt class="descname">parse</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTML.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTML.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTML.parse_multipart">
+<tt class="descname">parse_multipart</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTML.parse_multipart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTML.parse_multipart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a multipart message object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTML.parse_singlepart">
+<tt class="descname">parse_singlepart</tt><big>(</big><em>message=None</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTML.parse_singlepart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTML.parse_singlepart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses a singlepart message object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymime.plugins.plugin_striphtml.StripHTMLParser">
+<em class="property">class </em><tt class="descclassname">pymime.plugins.plugin_striphtml.</tt><tt class="descname">StripHTMLParser</tt><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTMLParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTMLParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/library/htmlparser.html#HTMLParser.HTMLParser" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">HTMLParser.HTMLParser</span></tt></a></p>
+<p>This class provides the necessary logic to convert HTML to plain text.</p>
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTMLParser.get_plain_data">
+<tt class="descname">get_plain_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTMLParser.get_plain_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTMLParser.get_plain_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTMLParser.handle_data">
+<tt class="descname">handle_data</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTMLParser.handle_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTMLParser.handle_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTMLParser.handle_endtag">
+<tt class="descname">handle_endtag</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTMLParser.handle_endtag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTMLParser.handle_endtag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTMLParser.handle_starttag">
+<tt class="descname">handle_starttag</tt><big>(</big><em>tag</em>, <em>attributes</em><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTMLParser.handle_starttag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTMLParser.handle_starttag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugins.plugin_striphtml.StripHTMLParser.remove_whitespace">
+<tt class="descname">remove_whitespace</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugins/plugin_striphtml.html#StripHTMLParser.remove_whitespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugins.plugin_striphtml.StripHTMLParser.remove_whitespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Included Plugins</a><ul>
+<li><a class="reference internal" href="#module-pymime.plugins.plugin_archiveheader">Archiveheader</a></li>
+<li><a class="reference internal" href="#module-pymime.plugins.plugin_attachmentservice">Attachmentservice</a></li>
+<li><a class="reference internal" href="#module-pymime.plugins.plugin_footer">Footer</a></li>
+<li><a class="reference internal" href="#module-pymime.plugins.plugin_striphtml">Striphtml</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="previous chapter">PyMIME&#8217;s API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/included_plugins.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="PyMIME’s API"
+             >previous</a> |</li>
+        <li><a href="index.html">PyMIME v0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Alexander Werner.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

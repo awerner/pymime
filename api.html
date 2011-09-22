@@ -1,0 +1,352 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PyMIME’s API &mdash; PyMIME v0.2 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyMIME v0.2 documentation" href="index.html" />
+    <link rel="next" title="Included Plugins" href="included_plugins.html" />
+    <link rel="prev" title="Welcome to PyMIME’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="included_plugins.html" title="Included Plugins"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to PyMIME’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyMIME v0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pymime-s-api">
+<h1>PyMIME&#8217;s API<a class="headerlink" href="#pymime-s-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pymime.client">
+<span id="client"></span><h2>client<a class="headerlink" href="#module-pymime.client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.client.Client">
+<em class="property">class </em><tt class="descclassname">pymime.client.</tt><tt class="descname">Client</tt><a class="reference internal" href="_modules/pymime/client.html#Client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.client.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="pymime.client.Client.parse_opts">
+<tt class="descname">parse_opts</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/client.html#Client.parse_opts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.client.Client.parse_opts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.client.Client.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/client.html#Client.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.client.Client.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.client.Client.send">
+<tt class="descname">send</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/client.html#Client.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.client.Client.send" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.client.Client.setup_logging">
+<tt class="descname">setup_logging</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/client.html#Client.setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.client.Client.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.client.Client.start_daemon">
+<tt class="descname">start_daemon</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/client.html#Client.start_daemon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.client.Client.start_daemon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.config">
+<span id="config"></span><h2>config<a class="headerlink" href="#module-pymime.config" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.config.ConfigWrapper">
+<em class="property">class </em><tt class="descclassname">pymime.config.</tt><tt class="descname">ConfigWrapper</tt><big>(</big><em>plugin_namespace=None</em><big>)</big><a class="reference internal" href="_modules/pymime/config.html#ConfigWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.config.ConfigWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pymime.config.SectionWrapper">
+<em class="property">class </em><tt class="descclassname">pymime.config.</tt><tt class="descname">SectionWrapper</tt><big>(</big><em>config</em>, <em>section</em><big>)</big><a class="reference internal" href="_modules/pymime/config.html#SectionWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.config.SectionWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.daemon">
+<span id="daemon"></span><h2>daemon<a class="headerlink" href="#module-pymime.daemon" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.daemon.ProcessManager">
+<em class="property">class </em><tt class="descclassname">pymime.daemon.</tt><tt class="descname">ProcessManager</tt><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>This is the main object of pymimed. It runs and maintains the Worker processes.
+It is also responsible for setting up the logging and the socket Listener.</p>
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.join">
+<tt class="descname">join</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.join" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.join_exited_processes">
+<tt class="descname">join_exited_processes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.join_exited_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.join_exited_processes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.maintain_processes">
+<tt class="descname">maintain_processes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.maintain_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.maintain_processes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.populate_processes">
+<tt class="descname">populate_processes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.populate_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.populate_processes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.reload">
+<tt class="descname">reload</tt><big>(</big><em>signum=None</em>, <em>frame=None</em><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.reload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.setup_logging">
+<tt class="descname">setup_logging</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the logging configuration and sets up the root logger.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.shutdown">
+<tt class="descname">shutdown</tt><big>(</big><em>signum=None</em>, <em>frame=None</em><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.ProcessManager.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#ProcessManager.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.ProcessManager.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymime.daemon.Worker">
+<em class="property">class </em><tt class="descclassname">pymime.daemon.</tt><tt class="descname">Worker</tt><big>(</big><em>listener</em>, <em>maxage=None</em><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">multiprocessing.process.Process</span></tt></p>
+<p>Waits for a job from a client and executes it.</p>
+<dl class="method">
+<dt id="pymime.daemon.Worker.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#Worker.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.Worker.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pymime.daemon.Worker.shutdown">
+<tt class="descname">shutdown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/daemon.html#Worker.shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.daemon.Worker.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.globals">
+<span id="globals"></span><h2>globals<a class="headerlink" href="#module-pymime.globals" title="Permalink to this headline">¶</a></h2>
+<p>Contains global static settings.</p>
+<dl class="data">
+<dt id="pymime.globals.CONFIGDIR">
+<tt class="descclassname">pymime.globals.</tt><tt class="descname">CONFIGDIR</tt><a class="headerlink" href="#pymime.globals.CONFIGDIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory where the configuration is searched for. (/etc/pymime)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.integration">
+<span id="integration"></span><h2>integration<a class="headerlink" href="#module-pymime.integration" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pymime.integration.django_store">
+<tt class="descclassname">pymime.integration.</tt><tt class="descname">django_store</tt><big>(</big><em>attachments</em>, <em>dropped_attachments</em>, <em>headers</em>, <em>options</em>, <em>policy_options</em><big>)</big><a class="reference internal" href="_modules/pymime/integration.html#django_store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.integration.django_store" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pymime.integration.dummy_store">
+<tt class="descclassname">pymime.integration.</tt><tt class="descname">dummy_store</tt><big>(</big><em>attachments</em>, <em>dropped_attachments</em>, <em>headers</em>, <em>options</em>, <em>policy_options</em><big>)</big><a class="reference internal" href="_modules/pymime/integration.html#dummy_store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.integration.dummy_store" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple store-function that returns a text with the number of attachments
+and does nothing with them, so they are lost.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pymime.integration.flat_store">
+<tt class="descclassname">pymime.integration.</tt><tt class="descname">flat_store</tt><big>(</big><em>attachments</em>, <em>dropped_attachments</em>, <em>headers</em>, <em>options</em>, <em>policy_options</em><big>)</big><a class="reference internal" href="_modules/pymime/integration.html#flat_store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.integration.flat_store" title="Permalink to this definition">¶</a></dt>
+<dd><p>This store-function saves the detached attachments in the directory options[&#8220;path&#8221;]
+(default: current working dir + store).
+Subdirectories containing the attachments are created named after the sha1-hash of the attachment, salted with options[&#8220;salt&#8221;].
+If specified, options[&#8220;text_after&#8221;] is appended to the attachment list.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pymime.plugin">
+<span id="plugin"></span><h2>plugin<a class="headerlink" href="#module-pymime.plugin" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pymime.plugin.PluginProvider">
+<em class="property">class </em><tt class="descclassname">pymime.plugin.</tt><tt class="descname">PluginProvider</tt><a class="reference internal" href="_modules/pymime/plugin.html#PluginProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugin.PluginProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Parent of all Plugins.</p>
+<dl class="attribute">
+<dt id="pymime.plugin.PluginProvider.config">
+<tt class="descname">config</tt><a class="headerlink" href="#pymime.plugin.PluginProvider.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>An Instance of the pymime.config.ConfigWrapper for easy access to configuration values if the plugin has an own configuration file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pymime.plugin.PluginProvider.hasconfig">
+<tt class="descname">hasconfig</tt><a class="headerlink" href="#pymime.plugin.PluginProvider.hasconfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the plugin has its own configuration file.
+The file will be loaded at instantiation and searched for in pymime.globals.CONFIGDIR and in the plugins directory with the name plugin_NAME.conf and plugin_NAME.conf.default repectively.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pymime.plugin.PluginProvider.name">
+<tt class="descname">name</tt><a class="headerlink" href="#pymime.plugin.PluginProvider.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the plugin. Must be overwritten.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pymime.plugin.PluginProvider.order">
+<tt class="descname">order</tt><a class="headerlink" href="#pymime.plugin.PluginProvider.order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the order of parsing. The higher the later.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymime.plugin.PluginProvider.parse">
+<tt class="descname">parse</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/pymime/plugin.html#PluginProvider.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugin.PluginProvider.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pymime.plugin.PluginRoot">
+<em class="property">class </em><tt class="descclassname">pymime.plugin.</tt><tt class="descname">PluginRoot</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pymime/plugin.html#PluginRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugin.PluginRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">type</span></tt></p>
+<p>Metaclass of all plugins.
+At plugin class definition, the class is added to the plugins list of the plugin provider.</p>
+<dl class="method">
+<dt id="pymime.plugin.PluginRoot.get_plugins">
+<tt class="descname">get_plugins</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pymime/plugin.html#PluginRoot.get_plugins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugin.PluginRoot.get_plugins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of instances of all registered plugins. Options can be passed to the constructors as parameters of this method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pymime.plugin.load_plugins">
+<tt class="descclassname">pymime.plugin.</tt><tt class="descname">load_plugins</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pymime/plugin.html#load_plugins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.plugin.load_plugins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pymime.utility">
+<span id="utility"></span><h2>utility<a class="headerlink" href="#module-pymime.utility" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pymime.utility.append_text">
+<tt class="descclassname">pymime.utility.</tt><tt class="descname">append_text</tt><big>(</big><em>message</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/pymime/utility.html#append_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.utility.append_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pymime.utility.unicode_header">
+<tt class="descclassname">pymime.utility.</tt><tt class="descname">unicode_header</tt><big>(</big><em>header</em><big>)</big><a class="reference internal" href="_modules/pymime/utility.html#unicode_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pymime.utility.unicode_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PyMIME&#8217;s API</a><ul>
+<li><a class="reference internal" href="#module-pymime.client">client</a></li>
+<li><a class="reference internal" href="#module-pymime.config">config</a></li>
+<li><a class="reference internal" href="#module-pymime.daemon">daemon</a></li>
+<li><a class="reference internal" href="#module-pymime.globals">globals</a></li>
+<li><a class="reference internal" href="#module-pymime.integration">integration</a></li>
+<li><a class="reference internal" href="#module-pymime.plugin">plugin</a></li>
+<li><a class="reference internal" href="#module-pymime.utility">utility</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to PyMIME&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="included_plugins.html"
+                        title="next chapter">Included Plugins</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="included_plugins.html" title="Included Plugins"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to PyMIME’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">PyMIME v0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Alexander Werner.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
