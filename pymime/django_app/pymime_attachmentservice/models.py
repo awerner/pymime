@@ -35,7 +35,7 @@ class Mail(models.Model):
             a.delete()
         super(Mail, self).delete(*args, **kwargs)
     def __unicode__(self):
-        return "{0} from {1} to {2} on {3}".format(self.subject, self.sender, self.receiver, self.date)
+        return u"{0} from {1} to {2} on {3}".format(self.subject, self.sender, self.receiver, self.date)
     class Meta:
         verbose_name = "mail"
         verbose_name_plural = "mails"
