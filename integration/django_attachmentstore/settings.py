@@ -12,6 +12,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+SERVER_EMAIL = "root@localhost"
+EMAIL_SUBJECT_PREFIX = "[PyMIME]"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
