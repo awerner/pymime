@@ -11,30 +11,37 @@
 <h1><span class="green">Py</span>MIME</h1>
 <strong>Mail Attachment Service</strong>
 </div>
-<div id="reportbutton"><a href="{% url pymime.django_app.pymime_attachmentservice.views.report_mail mail.uuid %}">
-Report Problems
-</a></div>
-<h2>{{mail.subject}}</h2>
+<h2>Report mail</h2>
+<p>You are reporting this mail:</p>
+<div id="reported_mail">
+<h3>{{mail.subject}}</h3>
 <p><strong>Sender: </strong>{{mail.sender}}<br />
 <strong>Receiver: </strong>{{mail.receiver}}<br />
 <strong>Date: </strong>{{mail.date}}<br />
-<strong>Attachments available until: </strong>{{mail.max_age_date}}
-{% if mail.archive_url %}
-<br />Original mail available in the mail archive <a href="{{mail.archive_url}}">here</a>.
-{% endif %}
 </p>
-<h3>Attachments</h3>
+<h4>Attachments</h4>
 {% for attachment in mail.attachments.all %}
-<h4><a href="{{attachment.file.url}}">{{attachment.filename_orig}}</a></h4>
+<h5>{{attachment.filename_orig}}</h5>
 <p><strong>Content-type: </strong>{{attachment.content_type}}<br />
 <strong>File size: </strong>{{attachment.printsize}}</p>
 {% endfor %}
-<h3>Dropped attachments</h3>
+<h4>Dropped attachments</h4>
 {% for attachment in mail.dropped_attachments.all %}
-<h4>{{attachment.filename}}</a></h4>
+<h5>{{attachment.filename}}</a></h5>
 <p><strong>Content-type: </strong>{{attachment.content_type}}<br />
 <strong>Reason: </strong>{{attachment.reason}}</p>
 {% endfor %}
+</div>
+
+<div id="reportform">
+<p>Please state the reason why you want to report the mail.<br />
+On form submission, your IP will be saved to prevent abuse of the service.</p>
+<form action="" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+</div>
+
 <div id="footer">
 <a href="{{ mail.get_admin_url }}">Admin</a>
 </div>

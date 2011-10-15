@@ -103,3 +103,15 @@ class Dropped_Attachment(models.Model):
     class Meta:
         verbose_name = "dropped attachment"
         verbose_name_plural = "dropped attachments"
+
+class Problem_Report(models.Model):
+    mail = models.ForeignKey(Mail, related_name= "problem report")
+    reason = models.TextField(max_length = 1000, verbose_name = "reason", blank = True)
+    ip = models.IPAddressField(verbose_name="reporter ip", blank = True)
+    headers = models.TextField(verbose_name = "header", blank = True)
+    reporter_address = models.EmailField(verbose_name = "reporter address", blank=True)
+    def __unicode__(self):
+        return "{0} sent from {1}".format(str(self.mail),str(self.reporter_address))
+    class Meta:
+        verbose_name = "problem report"
+        verbose_name_plural = "problem reports"
