@@ -19,6 +19,7 @@
 This script takes a MIME-formatted email and does various transformations with it,
 e.g. converts HTML-mails to plain text mails and strips attachements.
 """
+__version__="1.0.0"
 import HTMLParser, email, email.utils, sys
 from optparse import OptionParser
 # for archive-header
@@ -55,6 +56,7 @@ parser.add_option( "-k", "--keep-going", dest = "keep_going", action = "store_tr
                    help = "Ignore failures (ATM only missing footer file) as much as possible before failing." )
 parser.add_option( "-a", "--archive-header", dest = "archive_header", action = "store_true", default = False,
                    help = "Add Archived-At header for mail-archive.com" )
+parser.add_option( "-V", "--version", dest = "print_version", action = "store_true", default = False, help = "Show version and exit" )
 options, args = parser.parse_args()
 
 
@@ -264,6 +266,9 @@ class EMail( object ):
 
 
 if __name__ == "__main__":
+    if options.print_version:
+        print("pymime "+__version__)
+        exit()
     if options.input == "-":
         input = sys.stdin
     else:
