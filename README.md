@@ -1,8 +1,18 @@
 pymime - A MIME formatter in python
 ===================================
 
-This program is designed to take a MIME-formatted email and to do various transformations with it, e.g.
-converting HTML-mail to plain text mail and stripping attachments.
+This program is designed to take a MIME-formatted email and do the following actions:
+- convert HTML-parts of singlepart-mails to plaintext
+- strip HTML-parts of multipart-mails
+- strip attachments
+- optionally append a footer to the mail
+- optionally add an X-Archived-At header for mail-archive.com
+
+Requirements
+------------
+
+Tested with python 2.6 and 2.7.
+Currently not compatible with python 3.X, as this would require dropping 2.6 support.
 
 Usage
 -----
@@ -28,3 +38,18 @@ License
 -------
 
 GPLv3
+
+Source
+------
+
+https://github.com/tdf/pymime
+
+Bugs
+----
+
+https://github.com/tdf/pymime/issues
+
+Contact
+-------
+
+alex@documentfoundation.org
